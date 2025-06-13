@@ -1,3 +1,4 @@
+@import url('https://fonts.googleapis.com/css2?family=Syne:wght@400..800&display=swap');
 @import "tailwindcss";
 
 :root {
@@ -10,6 +11,10 @@
   --color-foreground: var(--foreground);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
+  --font-syne: 'Syne', sans-serif;
+  
+  /* Override screen sizes to use dynamic viewport units */
+  --size-screen: 100dvw;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -23,4 +28,34 @@ body {
   background: var(--background);
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
+}
+
+@font-face {
+  font-family: 'Syne';
+  src: url('..//fonts/Syne.woff') format('woff');
+  font-weight: 400;
+  font-style: normal;
+}
+
+.font-Syne {
+  font-family: 'Syne', sans-serif;
+}
+
+
+@layer utilities {
+  .h-screen {
+    height: 100dvh;
+  }
+  
+  .w-screen {
+    width: 100dvw;
+  }
+  
+  .min-h-screen {
+    min-height: 100dvh;
+  }
+  
+  .max-h-screen {
+    max-height: 100dvh;
+  }
 }
