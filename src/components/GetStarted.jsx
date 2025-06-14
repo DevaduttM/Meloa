@@ -1,6 +1,7 @@
 import React from 'react'
 import Image from "next/image";
 import { motion } from "framer-motion";
+import Link from 'next/link';
 
 const GetStarted = () => {
   return (
@@ -9,7 +10,7 @@ const GetStarted = () => {
         initial={{ opacity: 0.3 }}
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
-        transition={{ duration: 0.5 }}
+        transition={{ duration: 0.5}}
         className="h-screen w-screen flex items-center justify-start flex-col bg-[#171717]">
             <div className="h-[50%] flex items-center justify-center flex-col">
                 <Image
@@ -50,7 +51,7 @@ const GetStarted = () => {
                 </p>
             </div>
 
-            <button className='absolute bottom-4 w-3/4 font-bold h-[2.5rem] bg-[#27df6a] text-black rounded-3xl font-syne text-sm cursor-pointer'>Get Started</button>
+            <Link href='/signin' className='absolute bottom-4 w-3/4 font-bold h-[2.5rem] bg-[#27df6a] text-black rounded-3xl font-syne text-sm cursor-pointer flex justify-center items-center'>Get Started</Link>
         </motion.div>
     </>
   )
