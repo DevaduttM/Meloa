@@ -72,22 +72,22 @@ const HomeScreen = () => {
               <Image
                 src="/logo_img_only.png"
                 alt="Logo"
-                width={30}
-                height={30}
+                width={35}
+                height={35}
               />
-              <h1 className="text-transparent bg-gradient-to-r from-[#27df6a] to-[#afafaf] bg-clip-text text-2xl font-bold font-syne">
+              <h1 className="text-transparent bg-gradient-to-r from-[#27df6a] to-[#afafaf] bg-clip-text text-3xl font-bold font-syne">
                 Meloa
               </h1>
             </div>
             <div className="w-fit h-full flex justify-center items-center gap-2">
-              <FaRegCircleUser className="text-2xl text-[#27df6a] mr-2" />
+              <FaRegCircleUser className="text-3xl text-[#27df6a] mr-2" />
             </div>
           </div>
           <div className="w-full flex flex-col justify-center items-start mt-10">
-            <h1 className="text-white text-xl pl-6 font-syne">
+            <h1 className="text-white text-2xl pl-6 font-syne">
               Trending Tracks
             </h1>
-            <div className="w-full pl-6 py-5 flex flex-row justify-start items-center overflow-x-scroll scrollbar-hide">
+            <div className="w-full pl-6 py-8 flex flex-row justify-start items-center overflow-x-scroll scrollbar-hide">
               {[...Array(2)].map((_, outerIndex) => (
                 <div
                   key={outerIndex}
@@ -102,15 +102,15 @@ const HomeScreen = () => {
                         <Image
                           src="/logo_img_only.png"
                           alt="Track Cover"
-                          width={25}
-                          height={25}
-                          className="bg-[#1f1f1f] rounded-lg h-10 w-10 p-2"
+                          width={30}
+                          height={30}
+                          className="bg-[#1f1f1f] rounded-lg h-15 w-15 p-3"
                         />
                         <div className="h-full w-full flex flex-col items-start justify-center">
-                          <h1 className="text-white text-sm font-syne">
+                          <h1 className="text-white text-md font-syne">
                             Track Title
                           </h1>
-                          <h2 className="text-gray-400 text-xs font-syne">
+                          <h2 className="text-gray-400 text-sm font-syne">
                             Artist Name
                           </h2>
                         </div>
@@ -122,14 +122,14 @@ const HomeScreen = () => {
               ))}
             </div>
 
-            <h1 className="text-white pl-6 text-xl font-syne">
+            <h1 className="text-white pl-6 text-2xl font-syne">
               Popular Genres
             </h1>
-            <div className="relative w-full grid grid-cols-2 grid-rows-3 gap-4 pl-3 pr-5 mt-5">
+            <div className="relative w-full grid grid-cols-2 grid-rows-3 gap-4 pl-3 pr-5 mt-8">
               {shuffledGenres.map((genre, index) => (
                 <div
                   key={index}
-                  className="relative rounded-lg h-20 w-full m-1 flex justify-center items-center overflow-hidden"
+                  className="relative rounded-lg h-25 w-full m-1 flex justify-center items-center overflow-hidden"
                   style={{
                     background: `linear-gradient(to right, ${genre.gradientFrom}, ${genre.gradientTo})`,
                   }}
@@ -140,17 +140,17 @@ const HomeScreen = () => {
                     width={50}
                     height={50}
                     className="absolute -right-4 -bottom-4 rounded-sm h-16 w-16 object-cover -rotate-45"/>
-                  <h2 className="text-white text-md font-syne">
+                  <h2 className="text-white text-lg font-syne">
                     {genre.name}
                   </h2>
                 </div>
               ))}
             </div>
 
-            <h1 className="text-white pl-6 text-xl mt-10 font-syne">
+            <h1 className="text-white pl-6 text-2xl mt-10 font-syne">
               Recommended For You
             </h1>
-            <div className="w-full pl-6 py-5 flex flex-row justify-start items-center overflow-x-scroll scrollbar-hide pb-[20%]">
+            <div className="w-full pl-6 py-8 flex flex-row justify-start items-center overflow-x-scroll scrollbar-hide pb-30">
               {[...Array(2)].map((_, outerIndex) => (
                 <div
                   key={outerIndex}
@@ -165,15 +165,15 @@ const HomeScreen = () => {
                         <Image
                           src="/logo_img_only.png"
                           alt="Track Cover"
-                          width={25}
-                          height={25}
-                          className="bg-[#1f1f1f] rounded-lg h-10 w-10 p-2"
+                          width={30}
+                          height={30}
+                          className="bg-[#1f1f1f] rounded-lg h-15 w-15 p-3"
                         />
                         <div className="h-full w-full flex flex-col items-start justify-center">
-                          <h1 className="text-white text-sm font-syne">
+                          <h1 className=" track-title text-white text-md font-syne">
                             Track Title
                           </h1>
-                          <h2 className="text-gray-400 text-xs font-syne">
+                          <h2 className="text-gray-400 text-sm font-syne">
                             Artist Name
                           </h2>
                         </div>

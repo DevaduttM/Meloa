@@ -23,7 +23,7 @@ const Navbar = () => {
                     <LibraryScreen />
                 ) : null
             }
-            <div className="fixed bottom-0 w-full h-[8%] bg-gradient-to-t from-black to-transparent backdrop-blur-lg flex items-center justify-around px-10">
+            <div className="fixed bottom-0 w-full h-[7%] bg-gradient-to-t from-black to-[#00000052] backdrop-blur-lg flex items-center justify-around px-10">
                 <div onClick={() => setPage("home")} className="flex h-full items-center justify-center flex-col">
                     <AiFillHome className= {`text-xl ${page === "home" ? "text-[#27df6a]" : "white"} transition-colors duration-200`} />
                     <span className={`font-syne text-xs ${page === "home" ? "text-[#27df6a]" : "white"}`}>Home</span>
