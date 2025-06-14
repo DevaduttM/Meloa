@@ -7,6 +7,7 @@ import GetStarted from "@/components/GetStarted";
 export default function Home() {
 
   const [splash, setSplash] = useState(true);
+
   useEffect(() => {
     const timer = setTimeout(() => {
       setSplash(false);

@@ -1,13 +1,15 @@
 "use client";
-import React, { useState } from "react";
+import React, { use, useState } from "react";
 import Image from "next/image";
 import { FaGoogle } from "react-icons/fa";
 import { AnimatePresence, motion } from "framer-motion";
+import { useRouter } from "next/navigation";
 
 const Signin = () => {
   const [signin, setSignin] = useState(true);
 
   const formKey = signin ? "signin" : "signup";
+  const router = useRouter();
 
   return (
     <div className="h-screen w-screen flex items-center justify-center bg-[#171717] relative">
@@ -68,7 +70,7 @@ const Signin = () => {
             </form>
           </div>
 
-          <button className="w-[75%] h-[3rem] font-bold bg-[#27df6a] text-black rounded-xl font-syne text-sm cursor-pointer flex justify-center items-center">
+          <button onClick={() => {router.push('/home')}} className="w-[75%] h-[3rem] font-bold bg-[#27df6a] text-black rounded-xl font-syne text-sm cursor-pointer flex justify-center items-center">
             {signin ? "Sign In" : "Sign Up"}
           </button>
 
