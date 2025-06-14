@@ -29,7 +29,7 @@ const Navbar = () => {
                 page === "home" && loading ? (
                     <HomeScreenShimmer />
                 ) : page === "home" ? (
-                    <HomeScreen setPage={setPage} />
+                    <HomeScreen />
                 ) : page === "search" ? (
                     <SearchScreen />
                 ) : page === "library" ? (

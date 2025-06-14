@@ -4,9 +4,13 @@ import Image from "next/image";
 import { FaGoogle } from "react-icons/fa";
 import { AnimatePresence, motion } from "framer-motion";
 import { useRouter } from "next/navigation";
+import { IoEyeOffSharp } from "react-icons/io5";
+import { IoEyeSharp } from "react-icons/io5";
+
 
 const Signin = () => {
   const [signin, setSignin] = useState(true);
+  const [showPassword, setShowPassword] = useState(false);
 
   const formKey = signin ? "signin" : "signup";
   const router = useRouter();
@@ -49,23 +53,41 @@ const Signin = () => {
               </span>
             </div>
 
-            <form>
+            <form className="w-full flex flex-col items-center">
               <input
                 type="email"
                 placeholder="Email"
                 className="w-full h-[3.5rem] bg-[#1f1f1f] text-white rounded-xl px-4 mb-4 outline-none border border-[#a5a5a549] focus:border-white text-sm font-syne"
               />
-              <input
-                type="password"
-                placeholder="Password"
-                className="w-full h-[3.5rem] bg-[#1f1f1f] text-white rounded-xl px-4 mb-4 outline-none border border-[#a5a5a549] focus:border-white text-sm font-syne"
-              />
-              {!signin && (
+              <div className="relative w-full mb-4">
                 <input
-                  type="password"
-                  placeholder="Confirm Password"
-                  className="w-full h-[3.5rem] bg-[#1f1f1f] text-white rounded-xl px-4 mb-4 outline-none border border-[#a5a5a549] focus:border-white text-sm font-syne"
+                  type={showPassword ? "text" : "password"}
+                  placeholder="Password"
+                  className="w-full h-[3.5rem] bg-[#1f1f1f] text-white rounded-xl px-4 outline-none border border-[#a5a5a549] focus:border-white text-sm font-syne"
                 />
+                {
+                    showPassword ? (
+                      <IoEyeSharp onClick={() => setShowPassword((prev) => !prev)} className="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-400 cursor-pointer" />
+                    ) : (
+                      <IoEyeOffSharp onClick={() => setShowPassword((prev) => !prev)} className="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-400 cursor-pointer" />
+                    )
+                }
+              </div>
+              {!signin && (
+                <div className="relative w-full mb-4">
+                <input
+                  type={showPassword ? "text" : "password"}
+                  placeholder="Confirm Password"
+                  className="w-full h-[3.5rem] bg-[#1f1f1f] text-white rounded-xl px-4 outline-none border border-[#a5a5a549] focus:border-white text-sm font-syne"
+                />
+                {
+                    showPassword ? (
+                      <IoEyeSharp onClick={() => setShowPassword((prev) => !prev)} className="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-400 cursor-pointer" />
+                    ) : (
+                      <IoEyeOffSharp onClick={() => setShowPassword((prev) => !prev)} className="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-400 cursor-pointer" />
+                    )
+                }
+              </div>
               )}
             </form>
           </div>
