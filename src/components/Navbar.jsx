@@ -7,12 +7,16 @@ import HomeScreen from './HomeScreen';
 import SearchScreen from './SearchScreen';
 import LibraryScreen from './LibraryScreen';
 import { motion } from 'framer-motion';
+import BottomPlayer from './BottomPlayer';
 import HomeScreenShimmer from './HomeScreenShimmer';
+import {PlayerContext} from '@/context/PlayerContext';
 
 const Navbar = () => {
 
     const [page, setPage] = useState("home");
     const [loading, setLoading] = useState(true);
+    const [playerOpen, setPlayerOpen] = useState(false);
+    const [playing, setPlaying] = useState(false);
 
     useEffect(() => {
         const timer = setTimeout(() => {
@@ -24,6 +28,8 @@ const Navbar = () => {
 
   return (
     <>
+        <PlayerContext.Provider value={{ playing, setPlaying, playerOpen, setPlayerOpen }}>
+
         <div className="h-screen w-screen flex justify-center items-center bg-[#171717]">
             {
                 page === "home" && loading ? (
@@ -72,6 +78,12 @@ const Navbar = () => {
                 </div>
             </div>
         </div>
+        {
+            <div className="fixed bottom-20 w-full flex justify-center items-center right-0">
+                {playerOpen && <BottomPlayer />}
+            </div>
+        }
+        </PlayerContext.Provider>
     </>
   )
 }

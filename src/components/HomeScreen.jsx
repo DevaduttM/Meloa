@@ -1,12 +1,15 @@
-import React, { useEffect, useState } from "react";
+import React, { createContext, useContext, useEffect, useState } from "react";
 import Image from "next/image";
 import { AnimatePresence, motion } from "framer-motion";
 import { FaRegCircleUser } from "react-icons/fa6";
 import { IoMdMore } from "react-icons/io";
+import { PlayerContext } from "@/context/PlayerContext";
+
 
 const HomeScreen = () => {
+  const [shuffledGenres, setShuffledGenres] = useState([]);
 
-    const [shuffledGenres, setShuffledGenres] = useState([]);
+  const player = useContext(PlayerContext);
 
   const genreDetails = [
     {
@@ -92,6 +95,10 @@ const HomeScreen = () => {
                 <div
                   key={outerIndex}
                   className="min-w-[65vw] flex-col gap-5 h-full flex justify-between items-center mr-4"
+                  onClick={() => {
+                    player.setPlayerOpen(true);
+                    player.setPlaying(true);
+                  }}
                 >
                   {[...Array(3)].map((_, index) => (
                     <div
