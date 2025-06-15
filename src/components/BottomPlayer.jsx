@@ -1,4 +1,4 @@
-import React, { useContext, useState } from 'react'
+import React, { useContext, useEffect, useState } from 'react'
 import { FaPlay } from "react-icons/fa6";
 import { FaPause } from "react-icons/fa6";
 import { PiFastForwardFill } from "react-icons/pi";
@@ -10,7 +10,11 @@ import { IoMdHeart } from "react-icons/io";
 import { AnimatePresence, motion } from 'framer-motion';
 import { RxDownload } from "react-icons/rx";
 import { PiRepeatLight } from "react-icons/pi";
-
+import { useRouter } from 'next/navigation';
+import { IoMdMore } from "react-icons/io";
+import { IoAdd } from "react-icons/io5";
+import { RiPlayListAddFill } from "react-icons/ri";
+import { PiPlaylist } from "react-icons/pi";
 
 import Image from 'next/image';
 
@@ -19,15 +23,35 @@ const BottomPlayer = () => {
     const playState = useContext(PlayerContext);
     const [openMainPlayer, setOpenMainPlayer] = useState(false);
     const [like, setLike] = useState(false);
+    const [optionDown, setOptionDown] = useState(false);
+    const [playlistScreen, setPlaylistScreen] = useState(false);
+    const [createPlaylistScreen, setCreatePlaylistScreen] = useState(false);
 
-  return (
+    const router = useRouter();
+
+    useEffect(() => {
+        const handlePopState = (event) => {
+            if (openMainPlayer) {
+                setOpenMainPlayer(false);
+            }
+        };
+        window.addEventListener('popstate', handlePopState);
+
+        return () => {
+            window.removeEventListener('popstate', handlePopState);
+        };
+    }, [openMainPlayer]);
+
+
+
+    return (
     <>
         <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        exit={{ opacity: 0 }}
-        transition={{ duration: 0.2 }}
-        onClick={() => setOpenMainPlayer(true)} className="h-17 w-[97%] rounded-lg bg-[#303030ad] border-[0.5px] border-[#ffffff1e] backdrop-blur-xs flex justify-between items-center pl-[0.3rem] pr-4">
+        initial={{ opacity: 0, y: 10 }}
+        animate={{ opacity: 1, y: 0 }}
+        exit={{ opacity: 0, y: 10 }}
+        transition={{ duration: 0.3, ease: "easeInOut" }}
+        onClick={() => {setOpenMainPlayer(true); window.history.pushState(null, "")}} className="h-17 w-[97%] rounded-lg bg-[#303030ad] border-[0.5px] border-[#ffffff1e] backdrop-blur-xs flex justify-between items-center pl-[0.3rem] pr-4">
             <div className="flex items-center gap-5">
                 <img src="/pop_cover.jpg" alt="Song Cover" className="h-14 w-14 rounded-md" />
                 <div className="flex flex-col">
@@ -55,9 +79,13 @@ const BottomPlayer = () => {
                     animate={{ opacity: 1 }}
                     exit={{ opacity: 0 }}
                     transition={{ duration: 0.2 }}
+                    onClick={() => setOptionDown(false)}
                     className="fixed top-0 left-0 w-screen h-screen bg-[url('/pop_cover.jpg')] bg-cover bg-center z-50 flex justify-center items-center">
-                    <div className="fixed top-0 left-0 bg-gradient-to-b from-[#1f1f1f57] to-black w-screen h-screen backdrop-blur-[15px] flex flex-col justify-center items-center">
+                    <div className="fixed top-0 left-0 bg-gradient-to-b from-[#1f1f1f57] to-[#171717] w-screen h-screen backdrop-blur-[15px] flex flex-col justify-center items-center">
                         <IoArrowBack onClick={() => setOpenMainPlayer(false)} className='absolute top-7 left-5 text-4xl text-white' />
+                        <div className="absolute top-7 right-5">
+                            <button onClick={(e) => {e.stopPropagation(); setPlaylistScreen(!playlistScreen)}} className="text-white text-3xl"><RiPlayListAddFill /></button>
+                        </div>
                         <Image
                             src="/pop_cover.jpg"
                             alt="Song Cover"
@@ -85,37 +113,87 @@ const BottomPlayer = () => {
                             <button className="text-white text-5xl"><PiFastForwardFill /></button>
                         </div>
                         <div className="fixed bottom-10 w-full flex justify-around items-center">
+                            <AnimatePresence mode='wait'>
                             {
                                 like ? (
-                                    <AnimatePresence>
                                     <motion.div
-                                    initial={{ opacity: 0 }}
-                                    animate={{ opacity: 1 }}
-                                    exit={{ opacity: 0 }}
-                                    transition={{ duration: 0.2 }}
-                                    className="flex items-center">
+                                        key="liked"
+                                        initial={{ opacity: 0.6 }}
+                                        animate={{ opacity: 1 }}
+                                        transition={{ duration: 0.2, ease: "easeInOut" }}
+                                        className="flex items-center">
                                         <button className="text-red-600 text-3xl" onClick={() => setLike(false)}><IoMdHeart /></button>
                                     </motion.div>
-                                    </AnimatePresence>
                                 ) : (
-                                    <AnimatePresence>
                                         <motion.div
-                                            initial={{ opacity: 0 }}
+                                            key="not-liked"
+                                            initial={{ opacity: 0.6 }}
                                             animate={{ opacity: 1 }}
-                                            exit={{ opacity: 0 }}
-                                            transition={{ duration: 0.2 }}
+
+                                            transition={{ duration: 0.2, ease: "easeInOut" }}
                                             className="flex items-center">
                                             <button className="text-white text-3xl" onClick={() => setLike(true)}><IoMdHeartEmpty /></button>
                                         </motion.div>
-                                    </AnimatePresence>
                                 )
                             }
+                                    </AnimatePresence>
                             <button className="text-white text-3xl"><RxDownload /></button>
                             <button className="text-white text-3xl"><PiRepeatLight /></button>
                         </div>
                     </div>
                 </motion.div>
             )}
+        </AnimatePresence>
+        <AnimatePresence>
+            {
+                playlistScreen && (
+                    <motion.div
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
+                        transition={{ duration: 0.2 }}
+                        onClick={() => {setPlaylistScreen(false); setCreatePlaylistScreen(false)}}
+                        className="fixed top-0 left-0 w-screen h-screen bg-[#000000b9] bg-opacity-50 z-50 flex justify-center items-center">
+                        <div onClick={(e) => e.stopPropagation()} className="bg-[#171717] p-5 h-[65%] w-[85%] rounded-lg shadow-lg flex flex-col justify-start items-center ">
+                            <div className="w-[95%] flex justify-between items-center mt-3 mb-5">
+                                <h1 className='text-white text-2xl font-syne'>Your Playlists</h1>
+                                <button onClick={() => setCreatePlaylistScreen(!createPlaylistScreen)} className="text-white text-3xl flex justify-center items-center">{createPlaylistScreen ? <PiPlaylist /> : <IoAdd />}</button>
+                            </div>
+                            <hr className='border-[#85858549] w-[98%]' />
+                            <div className="w-[95%] h-full mt-5 mb-5 flex flex-col justify-start items-center gap-2 overflow-y-scroll scrollbar-hide">
+                                { createPlaylistScreen ? (
+                                    <motion.div
+                                    initial={{ opacity: 0 }}
+                                    animate={{ opacity: 1 }}
+                                    exit={{ opacity: 0 }}
+                                    transition={{ duration: 0.5, ease: "easeInOut" }}
+                                    className="w-full h-full bg-[#1f1f1f] rounded-lg flex flex-col justify-center items-center px-4 mb-3">
+                                        <h1 className='text-white text-2xl font-syne w-[90%]'>Create Playlist</h1>
+                                        <div className="flex items-center gap-3 py-5 w-[90%]">
+                                            <input type="text" placeholder="Enter Playlist Name" className="text-white text-lg font-syne bg-[#222222] border-[0.5px] outline-none py-4 pl-3 rounded-lg focus:outline-white  w-full" />
+                                        </div>
+                                        <button onClick={() => setCreatePlaylistScreen(false)} className="text-black bg-[#27df6a] text-md  h-10 w-25 rounded-xl font-syne">Done</button>
+                                    </motion.div>
+                                ) : (
+                                    [...Array(10)].map((_, index) => (
+                                        <motion.div
+                                        initial={{ opacity: 0 }}
+                                        animate={{ opacity: 1 }}
+                                        exit={{ opacity: 0 }}
+                                        transition={{ duration: 0.5, ease: "easeInOut" }}
+                                        key={index} className="w-full bg-[#1f1f1f] rounded-lg flex justify-between items-center px-4 mb-3">
+                                            <div className="flex items-center gap-3 py-5">
+                                                <Image src="/logo_img_only.png" alt="Playlist Cover" width={40} height={40} className="rounded-md" />
+                                                <span className="text-white text-lg font-syne">Playlist Name {index + 1}</span>
+                                            </div>
+                                        </motion.div>
+                                    ))
+                                )}
+                            </div>
+                        </div>
+                    </motion.div>
+                )
+            }
         </AnimatePresence>
     </>
   )
