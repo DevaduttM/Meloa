@@ -19,7 +19,7 @@ const Navbar = () => {
   const [playerOpen, setPlayerOpen] = useState(false);
   const [playing, setPlaying] = useState(false);
   const [currentTrack, setCurrentTrack] = useState(null);
-  const [audioUrl, setAudioUrl] = useState("");
+  const [audioUrl, setAudioUrl] = useState(null);
 
   useEffect(() => {
     const timer = setTimeout(() => {

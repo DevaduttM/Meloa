@@ -3,6 +3,8 @@ import { Innertube } from "youtubei.js";
 
 let youtubeInstance;
 
+export const runtime = "edge";
+
 export async function GET(request) {
   const { searchParams } = new URL(request.url);
   const query = searchParams.get("query");

@@ -1,6 +1,8 @@
 import ytdl from '@distube/ytdl-core';
 import { NextResponse } from 'next/server';
 
+export const runtime = 'edge';
+
 export async function GET(request) {
   const { searchParams } = new URL(request.url);
   const videoId = searchParams.get('id');
