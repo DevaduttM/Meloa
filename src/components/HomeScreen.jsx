@@ -70,22 +70,6 @@ const HomeScreen = () => {
           transition={{ duration: 0.3 }}
           className="h-screen w-screen flex justify-start items-center bg-[#171717] flex-col relative overflow-x-hidden overflow-y-scroll scrollbar-hide"
         >
-          <div className="top-0 w-full flex justify-between px-3 pt-7 items-center">
-            <div className="w-fit h-full flex justify-center items-center gap-2">
-              <Image
-                src="/logo_img_only.png"
-                alt="Logo"
-                width={35}
-                height={35}
-              />
-              <h1 className="text-transparent bg-gradient-to-r from-[#27df6a] to-[#afafaf] bg-clip-text text-3xl font-bold font-syne">
-                Meloa
-              </h1>
-            </div>
-            <div className="w-fit h-full flex justify-center items-center gap-2">
-              <FaRegCircleUser className="text-3xl text-[#27df6a] mr-2" />
-            </div>
-          </div>
           <div className="w-full flex flex-col justify-center items-start mt-10">
             <h1 className="text-white text-2xl pl-6 font-syne">
               Trending Tracks

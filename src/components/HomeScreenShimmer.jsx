@@ -15,22 +15,6 @@ const HomeScreenShimmer = () => {
           transition={{ duration: 0.3 }}
           className="h-screen w-screen flex justify-start items-center bg-[#171717] flex-col relative overflow-x-hidden overflow-y-scroll scrollbar-hide"
         >
-          <div className="top-0 w-full flex justify-between px-3 pt-7 items-center">
-            <div className="w-fit h-full flex justify-center items-center gap-2">
-              <Image
-                src="/logo_img_only.png"
-                alt="Logo"
-                width={35}
-                height={35}
-              />
-              <h1 className="text-transparent bg-gradient-to-r from-[#27df6a] to-[#afafaf] bg-clip-text text-3xl font-bold font-syne">
-                Meloa
-              </h1>
-            </div>
-            <div className="w-fit h-full flex justify-center items-center gap-2">
-              <FaRegCircleUser className="text-3xl text-[#27df6a] mr-2" />
-            </div>
-          </div>
           <div className="w-full flex flex-col justify-center items-start mt-10">
             <div className="bg-[#1f1f1f] ml-6 h-7 w-[35%] rounded-md animate-pulse"/>
             <div className="w-full pl-6 py-8 flex flex-row justify-start items-center overflow-x-scroll scrollbar-hide">

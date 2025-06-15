@@ -10,6 +10,8 @@ import { motion } from 'framer-motion';
 import BottomPlayer from './BottomPlayer';
 import HomeScreenShimmer from './HomeScreenShimmer';
 import {PlayerContext} from '@/context/PlayerContext';
+import Image from 'next/image';
+import { FaRegCircleUser } from "react-icons/fa6";
 
 const Navbar = () => {
 
@@ -30,7 +32,23 @@ const Navbar = () => {
     <>
         <PlayerContext.Provider value={{ playing, setPlaying, playerOpen, setPlayerOpen }}>
 
-        <div className="h-screen w-screen flex justify-center items-center bg-[#171717]">
+        <div className="h-screen w-screen flex justify-center flex-col items-center bg-[#171717]">
+            <div className="top-0 w-full flex justify-between px-3 pt-7 items-center">
+                        <div className="w-fit h-full flex justify-center items-center gap-2">
+                          <Image
+                            src="/logo_img_only.png"
+                            alt="Logo"
+                            width={35}
+                            height={35}
+                          />
+                          <h1 className="text-transparent bg-gradient-to-r from-[#27df6a] to-[#afafaf] bg-clip-text text-3xl font-bold font-syne">
+                            Meloa
+                          </h1>
+                        </div>
+                        <div className="w-fit h-full flex justify-center items-center gap-2">
+                          <FaRegCircleUser className="text-3xl text-[#27df6a] mr-2" />
+                        </div>
+                      </div>    
             {
                 page === "home" && loading ? (
                     <HomeScreenShimmer />

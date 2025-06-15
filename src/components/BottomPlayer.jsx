@@ -153,8 +153,8 @@ const BottomPlayer = () => {
                         exit={{ opacity: 0 }}
                         transition={{ duration: 0.2 }}
                         onClick={() => {setPlaylistScreen(false); setCreatePlaylistScreen(false)}}
-                        className="fixed top-0 left-0 w-screen h-screen bg-[#000000b9] bg-opacity-50 z-50 flex justify-center items-center">
-                        <div onClick={(e) => e.stopPropagation()} className="bg-[#171717] p-5 h-[65%] w-[85%] rounded-lg shadow-lg flex flex-col justify-start items-center ">
+                        className="fixed top-0 left-0 w-screen h-screen bg-[#0c0c0ca2] backdrop-blur-xs z-50 flex justify-center items-center">
+                        <div onClick={(e) => e.stopPropagation()} className="bg-gradient-to-b from-[#b8b8b838] to-[#9696962f] backdrop-blur-2xl p-5 h-[65%] w-[85%] rounded-lg shadow-lg flex flex-col justify-start items-center ">
                             <div className="w-[95%] flex justify-between items-center mt-3 mb-5">
                                 <h1 className='text-white text-2xl font-syne'>Your Playlists</h1>
                                 <button onClick={() => setCreatePlaylistScreen(!createPlaylistScreen)} className="text-white text-3xl flex justify-center items-center">{createPlaylistScreen ? <PiPlaylist /> : <IoAdd />}</button>
@@ -167,10 +167,10 @@ const BottomPlayer = () => {
                                     animate={{ opacity: 1 }}
                                     exit={{ opacity: 0 }}
                                     transition={{ duration: 0.5, ease: "easeInOut" }}
-                                    className="w-full h-full bg-[#1f1f1f] rounded-lg flex flex-col justify-center items-center px-4 mb-3">
+                                    className="w-full h-full bg-[#8d8d8d1e] rounded-lg flex flex-col justify-center items-center px-4 mb-3">
                                         <h1 className='text-white text-2xl font-syne w-[90%]'>Create Playlist</h1>
                                         <div className="flex items-center gap-3 py-5 w-[90%]">
-                                            <input type="text" placeholder="Enter Playlist Name" className="text-white text-lg font-syne bg-[#222222] border-[0.5px] outline-none py-4 pl-3 rounded-lg focus:outline-white  w-full" />
+                                            <input type="text" placeholder="Enter Playlist Name" className="text-white text-lg font-syne bg-[#8d8d8d1e] border-[0.5px] outline-none py-4 pl-3 rounded-lg focus:outline-white  w-full" />
                                         </div>
                                         <button onClick={() => setCreatePlaylistScreen(false)} className="text-black bg-[#27df6a] text-md  h-10 w-25 rounded-xl font-syne">Done</button>
                                     </motion.div>
@@ -181,7 +181,7 @@ const BottomPlayer = () => {
                                         animate={{ opacity: 1 }}
                                         exit={{ opacity: 0 }}
                                         transition={{ duration: 0.5, ease: "easeInOut" }}
-                                        key={index} className="w-full bg-[#1f1f1f] rounded-lg flex justify-between items-center px-4 mb-3">
+                                        key={index} className="w-full bg-gradient-to-r from-[#8d8d8d1e] to-[#68686842] backdrop-blur-lg rounded-lg flex justify-between items-center px-4 mb-3">
                                             <div className="flex items-center gap-3 py-5">
                                                 <Image src="/logo_img_only.png" alt="Playlist Cover" width={40} height={40} className="rounded-md" />
                                                 <span className="text-white text-lg font-syne">Playlist Name {index + 1}</span>
