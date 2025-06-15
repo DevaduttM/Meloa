@@ -53,7 +53,7 @@ const BottomPlayer = () => {
         transition={{ duration: 0.3, ease: "easeInOut" }}
         onClick={() => {setOpenMainPlayer(true); window.history.pushState(null, "")}} className="h-17 w-[97%] rounded-lg bg-[#303030ad] border-[0.5px] border-[#ffffff1e] backdrop-blur-xs flex justify-between items-center pl-[0.3rem] pr-4">
             <div className="flex items-center gap-5">
-                <img src="/pop_cover.jpg" alt="Song Cover" className="h-14 w-14 rounded-md" />
+                <img src="/rock_cover.jpg" alt="Song Cover" className="h-14 w-14 rounded-md" />
                 <div className="flex flex-col">
                     <span className="text-white text-md font-syne font-semibold">Song Title</span>
                     <span className="text-gray-400 font-syne text-sm">Artist Name</span>
@@ -80,14 +80,14 @@ const BottomPlayer = () => {
                     exit={{ opacity: 0 }}
                     transition={{ duration: 0.2 }}
                     onClick={() => setOptionDown(false)}
-                    className="fixed top-0 left-0 w-screen h-screen bg-[url('/pop_cover.jpg')] bg-cover bg-center z-50 flex justify-center items-center">
+                    className="fixed top-0 left-0 w-screen h-screen bg-[url('/rock_cover.jpg')] bg-cover bg-center z-50 flex justify-center items-center">
                     <div className="fixed top-0 left-0 bg-gradient-to-b from-[#1f1f1f57] to-[#171717] w-screen h-screen backdrop-blur-[15px] flex flex-col justify-center items-center">
                         <IoArrowBack onClick={() => setOpenMainPlayer(false)} className='absolute top-7 left-5 text-4xl text-white' />
                         <div className="absolute top-7 right-5">
                             <button onClick={(e) => {e.stopPropagation(); setPlaylistScreen(!playlistScreen)}} className="text-white text-3xl"><RiPlayListAddFill /></button>
                         </div>
                         <Image
-                            src="/pop_cover.jpg"
+                            src="/rock_cover.jpg"
                             alt="Song Cover"
                             width={200}
                             height={200}
