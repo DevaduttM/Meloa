@@ -9,7 +9,7 @@ import LibraryScreen from "./LibraryScreen";
 import { motion } from "framer-motion";
 import BottomPlayer from "./BottomPlayer";
 import HomeScreenShimmer from "./HomeScreenShimmer";
-import { PlayerContext } from "@/context/PlayerContext";
+import { PlayerContext, currentTrackContext } from "@/context/PlayerContext";
 import Image from "next/image";
 import { FaRegCircleUser } from "react-icons/fa6";
 
@@ -18,6 +18,8 @@ const Navbar = () => {
   const [loading, setLoading] = useState(true);
   const [playerOpen, setPlayerOpen] = useState(false);
   const [playing, setPlaying] = useState(false);
+  const [currentTrack, setCurrentTrack] = useState(null);
+  const [audioUrl, setAudioUrl] = useState("");
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -32,6 +34,7 @@ const Navbar = () => {
       <PlayerContext.Provider
         value={{ playing, setPlaying, playerOpen, setPlayerOpen }}
       >
+        <currentTrackContext.Provider value={{currentTrack, setCurrentTrack, audioUrl, setAudioUrl}}> 
         <div className="h-screen w-screen flex justify-center flex-col items-center bg-[#171717]">
           {page === "home" && loading ? (
             <HomeScreenShimmer />
@@ -155,6 +158,7 @@ const Navbar = () => {
             {playerOpen && <BottomPlayer />}
           </div>
         }
+        </currentTrackContext.Provider>
       </PlayerContext.Provider>
     </>
   );

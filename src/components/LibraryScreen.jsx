@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Image from "next/image";
 import { FaRegCircleUser } from "react-icons/fa6";
 import { AnimatePresence, motion } from "framer-motion";
@@ -10,6 +10,18 @@ import { PlaylistContext } from "@/context/PlayerContext";
 const LibraryScreen = () => {
   const [layout, setLayout] = useState("list");
   const [openPlaylistScreen, setOpenPlaylistScreen] = useState(false);
+
+  useEffect(() => {
+    const handlePopState = (event) => {
+      if (openPlaylistScreen) {
+        setOpenPlaylistScreen(false);
+      }
+    };
+      window.addEventListener("popstate", handlePopState);
+    return () => {
+      window.removeEventListener("popstate", handlePopState);
+    };
+  }, [openPlaylistScreen]);
 
   return (
     <>
@@ -75,10 +87,10 @@ const LibraryScreen = () => {
                 >
                   {[...Array(10)].map((_, index) => (
                     <div
-                    onClick={() => setOpenPlaylistScreen(true)}
+                      onClick={() => {setOpenPlaylistScreen(true); window.history.pushState(null, "");}}
                       className={`${
                         layout === "list"
-                          ? "flex items-center gap-3 mb-5 justify-center"
+                          ? "flex items-center gap-3 mb-5 justify-start w-full"
                           : "flex flex-col items-center justify-center"
                       } `}
                       key={index}

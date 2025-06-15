@@ -1,9 +1,9 @@
-import React, { useContext, useEffect, useState } from 'react'
+import React, { useContext, useEffect, useState, useRef } from 'react'
 import { FaPlay } from "react-icons/fa6";
 import { FaPause } from "react-icons/fa6";
 import { PiFastForwardFill } from "react-icons/pi";
 import { PiRewindFill } from "react-icons/pi";
-import { PlayerContext } from '@/context/PlayerContext';
+import { currentTrackContext, PlayerContext } from '@/context/PlayerContext';
 import { IoArrowBack } from "react-icons/io5";
 import { IoMdHeartEmpty } from "react-icons/io";
 import { IoMdHeart } from "react-icons/io";
@@ -16,14 +16,16 @@ import { IoAdd } from "react-icons/io5";
 import { RiPlayListAddFill } from "react-icons/ri";
 import { PiPlaylist } from "react-icons/pi";
 
+
 import Image from 'next/image';
 
 const BottomPlayer = () => {
 
+    const ref = useRef(null);
+
     const playState = useContext(PlayerContext);
     const [openMainPlayer, setOpenMainPlayer] = useState(false);
     const [like, setLike] = useState(false);
-    const [optionDown, setOptionDown] = useState(false);
     const [playlistScreen, setPlaylistScreen] = useState(false);
     const [createPlaylistScreen, setCreatePlaylistScreen] = useState(false);
 
@@ -42,10 +44,10 @@ const BottomPlayer = () => {
         };
     }, [openMainPlayer]);
 
-
-
+        const track = useContext(currentTrackContext);
     return (
     <>
+    <audio ref={ref} src={track?.audioUrl} controls className="hidden" autoPlay id="audio-player"></audio>
         <motion.div
         initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
@@ -55,17 +57,17 @@ const BottomPlayer = () => {
             <div className="flex items-center gap-5">
                 <img src="/rock_cover.jpg" alt="Song Cover" className="h-14 w-14 rounded-md" />
                 <div className="flex flex-col">
-                    <span className="text-white text-md font-syne font-semibold">Song Title</span>
-                    <span className="text-gray-400 font-syne text-sm">Artist Name</span>
+                    <span className="text-white text-md font-syne font-semibold">{(track?.currentTrack?.title || "").split(/[\(\[]/)[0].trim() || "Unknown Title"}</span>
+                    <span className="text-gray-400 font-syne text-sm">{track?.currentTrack.channel || "Unknown Artist"}</span>
                 </div>
             </div>
             <div onClick={(e) => e.stopPropagation()} className="flex items-center gap-6">
                 <button className="text-white text-2xl"><PiRewindFill /></button>
                 {
                     playState.playing ? (
-                        <button className="text-white text-2xl" onClick={() => playState.setPlaying(false)}><FaPause /></button>
+                        <button className="text-white text-2xl" onClick={() => {playState.setPlaying(false); ref.current.pause();}}><FaPause /></button>
                     ) : (
-                        <button className="text-white text-2xl" onClick={() => playState.setPlaying(true)}><FaPlay /></button>
+                        <button className="text-white text-2xl" onClick={() => {playState.setPlaying(true); ref.current.play();}}><FaPlay /></button>
                     )
                 }
                 <button className="text-white text-2xl"><PiFastForwardFill /></button>
@@ -79,21 +81,20 @@ const BottomPlayer = () => {
                     animate={{ opacity: 1 }}
                     exit={{ opacity: 0 }}
                     transition={{ duration: 0.2 }}
-                    onClick={() => setOptionDown(false)}
                     className="fixed top-0 left-0 w-screen h-screen bg-[url('/rock_cover.jpg')] bg-cover bg-center z-50 flex justify-center items-center">
                     <div className="fixed top-0 left-0 bg-gradient-to-b from-[#1f1f1f57] to-[#171717] w-screen h-screen backdrop-blur-[15px] flex flex-col justify-center items-center">
                         <IoArrowBack onClick={() => setOpenMainPlayer(false)} className='absolute top-7 left-5 text-4xl text-white' />
                         <div className="absolute top-7 right-5">
                             <button onClick={(e) => {e.stopPropagation(); setPlaylistScreen(!playlistScreen)}} className="text-white text-3xl"><RiPlayListAddFill /></button>
                         </div>
+                        <div className="relative w-3/4 aspect-square mb-15 shadow-[10px]">
                         <Image
-                            src="/rock_cover.jpg"
+                            src={track?.currentTrack.thumbnail || "/logo_img_only.png"}
                             alt="Song Cover"
-                            width={200}
-                            height={200}
-                            className="rounded-lg mb-15 w-3/4 aspect-square shadow-[10px]"/>
-                        <h1 className="text-white text-3xl font-syne">Track Name</h1>
-                        <h1 className="text-[#9c9c9c] text-xl font-syne mb-15">Artist Name</h1>
+                            fill
+                            className="rounded-lg object-cover mb-15 w-3/4 aspect-square shadow-[10px]"/></div>
+                        <h1 className="text-white text-3xl font-syne">{track?.currentTrack.title || "Unknown Title"}</h1>
+                        <h1 className="text-[#9c9c9c] text-xl font-syne mb-15">{track?.currentTrack.channel || "Unknown Artist"}</h1>
                         <div className="w-[80%] h-2 bg-gray-500 mb-5 rounded-2xl">
                             <div className="w-[50%] h-full bg-[#27df6a] rounded-2xl"></div>
                         </div>
@@ -105,9 +106,9 @@ const BottomPlayer = () => {
                             <button className="text-white text-5xl"><PiRewindFill /></button>
                             {
                                 playState.playing ? (
-                                    <button className="text-white text-6xl" onClick={() => playState.setPlaying(false)}><FaPause /></button>
+                                    <button className="text-white text-6xl" onClick={() => {playState.setPlaying(false); ref.current.pause();}}><FaPause /></button>
                                 ) : (
-                                    <button className="text-white text-6xl" onClick={() => playState.setPlaying(true)}><FaPlay /></button>
+                                    <button className="text-white text-6xl" onClick={() => {playState.setPlaying(true); ref.current.play();}}><FaPlay /></button>
                                 )
                             }
                             <button className="text-white text-5xl"><PiFastForwardFill /></button>
