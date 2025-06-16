@@ -19,6 +19,7 @@ import { PiPlaylist } from "react-icons/pi";
 
 
 import Image from 'next/image';
+import { Target } from 'lucide-react';
 
 const BottomPlayer = () => {
 
@@ -31,6 +32,7 @@ const BottomPlayer = () => {
     const [playlistScreen, setPlaylistScreen] = useState(false);
     const [createPlaylistScreen, setCreatePlaylistScreen] = useState(false);
     const [progress, setProgress] = useState(0);
+    const [repeat, setRepeat] = useState(false);
 
     const router = useRouter();
 
@@ -97,18 +99,18 @@ useEffect(() => {
 
     return (
     <>
-    <audio ref={ref} src={track?.audioUrl} controls className="hidden" autoPlay id="audio-player"></audio>
+    <audio ref={ref} loop = {repeat} src={track?.audioUrl} preload='auto' controls className="hidden" autoPlay id="audio-player"></audio>
         <motion.div
         initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
         exit={{ opacity: 0, y: 10 }}
         transition={{ duration: 0.3, ease: "easeInOut" }}
-        onClick={() => {setOpenMainPlayer(true); window.history.pushState(null, "")}} className="h-17 w-[97%] rounded-lg bg-[#303030ad] border-[0.5px] border-[#ffffff1e] backdrop-blur-xs flex justify-between items-center pl-[0.3rem] pr-4">
+        onClick={() => {setOpenMainPlayer(true); window.history.pushState(null, "")}} className="h-17 w-[97%] rounded-lg bg-[#303030ad] border-[0.5px] border-[#ffffff1e] backdrop-blur-xs flex justify-between items-center pl-[0.3rem] pr-4 overflow-hidden">
             <div className="flex items-center gap-5">
-                <img src={track?.currentTrack.thumbnail || "/logo_img_only.png"} alt="Song Cover" className="h-14 w-14 rounded-md object-cover" />
+                <img src={track?.currentTrack?.thumbnail || "/logo_img_only.png"} alt="Song Cover" className="h-14 w-14 rounded-md object-cover" />
                 <div className="flex flex-col overflow-hidden whitespace-nowrap relative w-[50vw]">
-                    <span className={`text-white ${track?.currentTrack?.title.split(/[\(\[\|]/)[0].trim().length > 35 ? "animate-scroll" : ""} text-md font-syne font-semibold`}>{(track?.currentTrack?.title || "").split(/[\(\[\|]/)[0].trim() || "Unknown Title"}</span>
-                    <span className="text-gray-400 font-syne text-sm">{track?.currentTrack.channel || "Unknown Artist"}</span>
+                    <span className={`text-white ${track?.currentTrack?.title.split(/[\(\[\|]/)[0].trim().length > 33 ? "animate-scroll" : ""} text-md font-syne font-semibold`}>{(track?.currentTrack?.title || "").split(/[\(\[\|]/)[0].trim() || "Unknown Title"}</span>
+                    <span className="text-gray-400 font-syne text-sm">{track?.currentTrack?.channel || "Unknown Artist"}</span>
                 </div>
             </div>
             <div onClick={(e) => e.stopPropagation()} className="flex items-center gap-6">
@@ -122,7 +124,7 @@ useEffect(() => {
                 }
                 <button className="text-white text-2xl"><PiFastForwardFill /></button>
             </div>
-            <div className="absolute bottom-0 left-0 h-[0.5px] bg-[#27df6a] rounded-xl" style={{ width: `${progress}%` }}></div>
+            <div className="absolute bottom-[0.1px] left-0 h-[0.5px] bg-[#27df6a] rounded-xl" style={{ width: `${progress}%` }}></div>
         </motion.div>
          <AnimatePresence>       
         {
@@ -132,7 +134,7 @@ useEffect(() => {
                     animate={{ opacity: 1 }}
                     exit={{ opacity: 0 }}
                     transition={{ duration: 0.2 }}
-                    className="fixed top-0 left-0 w-screen h-screen bg-[url('/rock_cover.jpg')] bg-cover bg-center z-50 flex justify-center items-center">
+                    className="fixed top-0 left-0 w-screen h-screen bg-cover bg-center z-50 flex justify-center items-center" style={{ backgroundImage: `url(${track?.currentTrack.thumbnail || "/logo_img_only.png"})` }}>
                     <div className="fixed top-0 left-0 bg-gradient-to-b from-[#1f1f1f57] to-[#171717] w-screen h-screen backdrop-blur-[15px] flex flex-col justify-center items-center">
                         <IoArrowBack onClick={() => setOpenMainPlayer(false)} className='absolute top-7 left-5 text-4xl text-white' />
                         <div className="absolute top-7 right-5">
@@ -144,10 +146,12 @@ useEffect(() => {
                             alt="Song Cover"
                             fill
                             className="rounded-lg object-cover mb-15 w-3/4 aspect-square shadow-[10px]"/></div>
-                        <h1 className={`text-white text-2xl whitespace-nowrap font-syne mx-5 ${track?.currentTrack?.title.split(/[\(\[\|]/)[0].trim().length > 35 ? "animate-scroll" : ""}`}>{track?.currentTrack.title.split(/[\(\[\|]/)[0].trim() || "Unknown Title"}</h1>
+                        <h1 className={`text-white text-2xl whitespace-nowrap font-syne mx-5 ${track?.currentTrack?.title.split(/[\(\[\|]/)[0].trim().length > 40 ? "animate-scroll" : ""}`}>{track?.currentTrack.title.split(/[\(\[\|]/)[0].trim() || "Unknown Title"}</h1>
                         <h1 className="text-[#9c9c9c] text-xl font-syne mb-15">{track?.currentTrack.channel || "Unknown Artist"}</h1>
-                        <div className="w-[80%] h-2 bg-gray-500 mb-5 rounded-2xl" onClick={handleSeek} ref={barRef}>
-                            <div className="w-[50%] h-full bg-[#27df6a] rounded-2xl transition-all duration-200 ease-in-out" style={{ width: `${progress}%` }}></div>
+                        <div className="relative w-[80%] h-2 bg-gray-500 mb-5 rounded-2xl" onClick={handleSeek} ref={barRef}>
+                            <div className="w-[50%] h-full overflow-ellipsis bg-[#27df6a] rounded-2xl transition-all duration-200 ease-in-out" style={{ width: `${progress}%` }}>
+                            </div>
+                            <div className="absolute w-3 h-3 top-1/2 -translate-y-1/2 transorm-all duration-200 ease-in-out bg-white rounded-full shadow-2xl z-5" style={{ left: `${progress}%`, transform: 'translateX(-50%)' }}></div>
                         </div>
                         <div className="w-[80%] h-2  mb-15 flex justify-between items-center">
                             <span className="text-gray-300 font-syne text-lg">{Math.floor(ref.current.currentTime / 60)}:{(Math.floor(ref.current.currentTime % 60).toString().padStart(2, '0'))}</span>
@@ -189,8 +193,8 @@ useEffect(() => {
                                 )
                             }
                                     </AnimatePresence>
-                            <button className="text-white text-3xl"><RxDownload /></button>
-                            <button className="text-white text-3xl"><PiRepeatLight /></button>
+                            <a href={`http://192.168.1.7:5000/download?id=${track.currentTrack.id}`} rel='noopener noreferrer' className="text-white text-3xl"><RxDownload /></a>
+                            <button className="text-[#27df6a] text-3xl" onClick={() => setRepeat(!repeat)}><PiRepeatLight className={repeat ? "text-[#27df6a]" : "text-white transition-colors duration-200"} /></button>
                         </div>
                     </div>
                 </motion.div>

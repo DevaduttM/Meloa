@@ -20,14 +20,50 @@ const Navbar = () => {
   const [playing, setPlaying] = useState(false);
   const [currentTrack, setCurrentTrack] = useState(null);
   const [audioUrl, setAudioUrl] = useState(null);
+  const [trendingSongs, setTrendingSongs] = useState([]);
+  const [chunks, setChunks] = useState([]);
 
   useEffect(() => {
-    const timer = setTimeout(() => {
-      setLoading(false);
-    }, 2000);
+    const handleTrendingSearch = async () => {
+      try {
+        const responseWorld = await fetch(
+          "/api/playlist?id=PLFcGX84jKOu7fnNxRpajpvs-Zk3Za41ul"
+        );
+        const dataWorld = await responseWorld.json();
+        const responseMal = await fetch(
+          "/api/playlist?id=PL4QNnZJr8sRPEJPqe7jZnsLPTBu1E3nIY"
+        );
+        const dataMal = await responseMal.json();
+        console.log("Trending data World:", dataWorld);
+        console.log("Trending data Malayalam:", dataMal);
+        setTrendingSongs([...dataWorld.results || [], ...dataMal.results || []]);
+        setLoading(false);
+      } catch (error) {
+        console.error("Error fetching trending data:", error);
+      }
+    }
 
-    return () => clearTimeout(timer);
+    handleTrendingSearch();
   }, []);
+
+    function getShuffledArray(array) {
+    return [...array].sort(() => Math.random() - 0.5);
+  }
+
+    useEffect(() => {
+const chunkArray = (arr, size) => {
+    const shuffledTrending = getShuffledArray(trendingSongs);
+    const trending_grouped = [];
+    for (let i = 0; i < shuffledTrending.length; i += size) {
+      console.log(shuffledTrending.slice(i, i + size));
+      trending_grouped.push(shuffledTrending.slice(i, i + size));
+    }
+    console.log("Chunked Trending Songs:", trending_grouped);
+    return trending_grouped;
+  };
+  const chunks = chunkArray(trendingSongs, 3);
+  setChunks(chunks);
+}, [trendingSongs]);
 
   return (
     <>
@@ -39,7 +75,7 @@ const Navbar = () => {
           {page === "home" && loading ? (
             <HomeScreenShimmer />
           ) : page === "home" ? (
-            <HomeScreen />
+            <HomeScreen trendingSongs={chunks} />
           ) : page === "search" ? (
             <SearchScreen />
           ) : page === "library" ? (

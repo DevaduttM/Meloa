@@ -41,7 +41,36 @@ app.get('/audio', async (req, res) => {
   }
 });
 
+app.get('/download', async (req, res) => {
+    const videoId = req.query.id;
+    
+    if (!videoId || !ytdl.validateID(videoId)) {
+        return res.status(400).json({ error: 'Invalid or missing video ID' });
+    }
+    
+    try {
+        const url = `https://www.youtube.com/watch?v=${videoId}`;
+        const info = await ytdl.getInfo(url);
+    
+        const bestAudio = ytdl.chooseFormat(info.formats, {
+        quality: 'highestaudio',
+        filter: 'audioonly',
+        });
+    
+        if (!bestAudio?.url) {
+        return res.status(404).json({ error: 'No audio stream found' });
+        }
 
-app.listen(PORT, () => {
+        res.setHeader('Content-Disposition', `attachment; filename="${info.videoDetails.title.split(/[\(\[\|]/)[0].trim()}.mp3"`);
+        res.setHeader('Content-Type', bestAudio.mimeType);
+        ytdl(url, { format: bestAudio }).pipe(res);
+    } catch (err) {
+        console.error('Error fetching audio stream:', err);
+        res.status(500).json({ error: 'Internal Server Error' });
+    }
+});
+
+
+app.listen(PORT, '0.0.0.0', () => {
   console.log(`Server is running on http://localhost:${PORT}`);
 });

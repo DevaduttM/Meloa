@@ -3,12 +3,16 @@ import Image from "next/image";
 import { AnimatePresence, motion } from "framer-motion";
 import { FaRegCircleUser } from "react-icons/fa6";
 import { IoMdMore } from "react-icons/io";
-import { PlayerContext } from "@/context/PlayerContext";
+import { PlayerContext, currentTrackContext } from "@/context/PlayerContext";
+import TrackList from "./TrackList";
+import { handleFetchAudio } from "@/utils/apicalls";
 
-const HomeScreen = () => {
+const HomeScreen = ({trendingSongs}) => {
   const [shuffledGenres, setShuffledGenres] = useState([]);
+  const [chunks, setChunks] = useState([]);
 
   const player = useContext(PlayerContext);
+  const track = useContext(currentTrackContext);
 
   const genreDetails = [
     {
@@ -58,6 +62,10 @@ const HomeScreen = () => {
     return [...array].sort(() => Math.random() - 0.5);
   }
 
+  console.log("Trending Songs:", trendingSongs);
+
+
+
   return (
     <>
       <AnimatePresence>
@@ -89,38 +97,20 @@ const HomeScreen = () => {
               Trending Tracks
             </h1>
             <div className="w-full pl-6 py-8 flex flex-row justify-start items-center overflow-x-scroll scrollbar-hide">
-              {[...Array(2)].map((_, outerIndex) => (
+              {trendingSongs.map((chunk, outerIndex) => (
                 <div
                   key={outerIndex}
                   className="min-w-[65vw] flex-col gap-5 h-full flex justify-between items-center mr-4"
-                  onClick={() => {
-                    player.setPlayerOpen(true);
-                    player.setPlaying(true);
-                  }}
                 >
-                  {[...Array(3)].map((_, index) => (
+                  {chunk.map((item, index) => (
                     <div
                       key={index}
-                      className="w-full h-full flex justify-between items-center mb-3"
+                      className="w-full h-full flex justify-between items-start mb-3"
                     >
-                      <div className="flex justify-center items-center gap-3 w-full">
-                        <Image
-                          src="/logo_img_only.png"
-                          alt="Track Cover"
-                          width={30}
-                          height={30}
-                          className="bg-[#1f1f1f] rounded-lg h-15 w-15 p-3"
-                        />
-                        <div className="h-full w-full flex flex-col items-start justify-center">
-                          <h1 className="text-white text-md font-syne">
-                            Track Title
-                          </h1>
-                          <h2 className="text-gray-400 text-sm font-syne">
-                            Artist Name
-                          </h2>
-                        </div>
-                      </div>
-                      <IoMdMore className="text-2xl text-gray-200" />
+                      <TrackList
+                        data={item}
+                        width="w-full"
+                      />
                     </div>
                   ))}
                 </div>

@@ -7,6 +7,7 @@ import { RiSearch2Line } from "react-icons/ri";
 import TrackList from "./TrackList";
 import { currentTrackContext, PlayerContext } from '@/context/PlayerContext';
 import { RxCross2 } from "react-icons/rx";
+import TrackShimmer from "./TrackShimmer";
 
 
 
@@ -91,9 +92,12 @@ const SearchScreen = () => {
               <>
                 {searchQuery ? (
                   <>
-                    <h1 className={`text-gray-500 text-lg font-syne mt-4 ${searchResults.length > 0 && searchPerformed == true ? 'hidden' : ''}`}>
-                      Searching for: {searchQuery}
-                    </h1>
+                    <div className={`text-gray-500 text-lg font-syne mt-4 h-full justify-start flex-col items-center pt-6 px-5 ${searchResults.length > 0 && searchPerformed == true ? 'hidden' : ''}`}>
+                      {
+                        [...Array(5)].map((_, index) => (
+                          <TrackShimmer key={index} />
+                        ))}
+                    </div>
                     {searchResults.length > 0 && searchPerformed == true ? (
                       <div className="w-screen h-full gap-4 px-5 overflow-y-scroll scrollbar-hide flex flex-col items-center mt-10">
                         {searchResults.map((result, index) => (
