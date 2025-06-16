@@ -17,17 +17,20 @@ import { RiPlayListAddFill } from "react-icons/ri";
 import { PiPlaylist } from "react-icons/pi";
 
 
+
 import Image from 'next/image';
 
 const BottomPlayer = () => {
 
     const ref = useRef(null);
+    const barRef = useRef(null);
 
     const playState = useContext(PlayerContext);
     const [openMainPlayer, setOpenMainPlayer] = useState(false);
     const [like, setLike] = useState(false);
     const [playlistScreen, setPlaylistScreen] = useState(false);
     const [createPlaylistScreen, setCreatePlaylistScreen] = useState(false);
+    const [progress, setProgress] = useState(0);
 
     const router = useRouter();
 
@@ -45,6 +48,53 @@ const BottomPlayer = () => {
     }, [openMainPlayer]);
 
         const track = useContext(currentTrackContext);
+
+useEffect(() => {
+  const audio = ref.current;
+  if (!audio) return;
+
+  const updateProgress = () => {
+    if (audio.duration) {
+      const currentProgress = (audio.currentTime / audio.duration) * 100;
+      setProgress(currentProgress);
+    }
+  };
+
+  const onEnded = () => {
+    playState.setPlaying(false);
+    setProgress(0);
+  };
+
+  const onPlay = () => playState.setPlaying(true);
+  const onPause = () => playState.setPlaying(false);
+
+  audio.addEventListener('timeupdate', updateProgress);
+  audio.addEventListener('ended', onEnded);
+  audio.addEventListener('play', onPlay);
+  audio.addEventListener('pause', onPause);
+  audio.addEventListener('loadedmetadata', updateProgress);
+
+  return () => {
+    audio.removeEventListener('timeupdate', updateProgress);
+    audio.removeEventListener('ended', onEnded);
+    audio.removeEventListener('play', onPlay);
+    audio.removeEventListener('pause', onPause);
+    audio.removeEventListener('loadedmetadata', updateProgress);
+  };
+}, [track?.audioUrl, playState]);
+
+  const handleSeek = (e) => {
+    const audio = ref.current;
+    if (!audio || !barRef.current) return;
+
+    const rect = barRef.current.getBoundingClientRect();
+    const clickX = e.clientX - rect.left;
+    const percentage = clickX / rect.width;
+
+    audio.currentTime = percentage * audio.duration;
+    setProgress(percentage);
+  };
+
     return (
     <>
     <audio ref={ref} src={track?.audioUrl} controls className="hidden" autoPlay id="audio-player"></audio>
@@ -55,9 +105,9 @@ const BottomPlayer = () => {
         transition={{ duration: 0.3, ease: "easeInOut" }}
         onClick={() => {setOpenMainPlayer(true); window.history.pushState(null, "")}} className="h-17 w-[97%] rounded-lg bg-[#303030ad] border-[0.5px] border-[#ffffff1e] backdrop-blur-xs flex justify-between items-center pl-[0.3rem] pr-4">
             <div className="flex items-center gap-5">
-                <img src="/rock_cover.jpg" alt="Song Cover" className="h-14 w-14 rounded-md" />
-                <div className="flex flex-col">
-                    <span className="text-white text-md font-syne font-semibold">{(track?.currentTrack?.title || "").split(/[\(\[]/)[0].trim() || "Unknown Title"}</span>
+                <img src={track?.currentTrack.thumbnail || "/logo_img_only.png"} alt="Song Cover" className="h-14 w-14 rounded-md object-cover" />
+                <div className="flex flex-col overflow-hidden whitespace-nowrap relative w-[50vw]">
+                    <span className={`text-white ${track?.currentTrack?.title.split(/[\(\[\|]/)[0].trim().length > 35 ? "animate-scroll" : ""} text-md font-syne font-semibold`}>{(track?.currentTrack?.title || "").split(/[\(\[\|]/)[0].trim() || "Unknown Title"}</span>
                     <span className="text-gray-400 font-syne text-sm">{track?.currentTrack.channel || "Unknown Artist"}</span>
                 </div>
             </div>
@@ -72,6 +122,7 @@ const BottomPlayer = () => {
                 }
                 <button className="text-white text-2xl"><PiFastForwardFill /></button>
             </div>
+            <div className="absolute bottom-0 left-0 h-[0.5px] bg-[#27df6a] rounded-xl" style={{ width: `${progress}%` }}></div>
         </motion.div>
          <AnimatePresence>       
         {
@@ -93,14 +144,14 @@ const BottomPlayer = () => {
                             alt="Song Cover"
                             fill
                             className="rounded-lg object-cover mb-15 w-3/4 aspect-square shadow-[10px]"/></div>
-                        <h1 className="text-white text-3xl font-syne">{track?.currentTrack.title || "Unknown Title"}</h1>
+                        <h1 className={`text-white text-2xl whitespace-nowrap font-syne mx-5 ${track?.currentTrack?.title.split(/[\(\[\|]/)[0].trim().length > 35 ? "animate-scroll" : ""}`}>{track?.currentTrack.title.split(/[\(\[\|]/)[0].trim() || "Unknown Title"}</h1>
                         <h1 className="text-[#9c9c9c] text-xl font-syne mb-15">{track?.currentTrack.channel || "Unknown Artist"}</h1>
-                        <div className="w-[80%] h-2 bg-gray-500 mb-5 rounded-2xl">
-                            <div className="w-[50%] h-full bg-[#27df6a] rounded-2xl"></div>
+                        <div className="w-[80%] h-2 bg-gray-500 mb-5 rounded-2xl" onClick={handleSeek} ref={barRef}>
+                            <div className="w-[50%] h-full bg-[#27df6a] rounded-2xl transition-all duration-200 ease-in-out" style={{ width: `${progress}%` }}></div>
                         </div>
                         <div className="w-[80%] h-2  mb-15 flex justify-between items-center">
-                            <span className="text-gray-300 font-syne text-lg">2:15</span>
-                            <span className="text-gray-300 font-syne text-lg">4:30</span>
+                            <span className="text-gray-300 font-syne text-lg">{Math.floor(ref.current.currentTime / 60)}:{(Math.floor(ref.current.currentTime % 60).toString().padStart(2, '0'))}</span>
+                            <span className="text-gray-300 font-syne text-lg">{Math.floor(ref.current.duration / 60)}:{(Math.floor(ref.current.duration % 60).toString().padStart(2, '0'))}</span>
                         </div>
                         <div className="w-[70%] flex justify-around items-center">
                             <button className="text-white text-5xl"><PiRewindFill /></button>
@@ -196,6 +247,19 @@ const BottomPlayer = () => {
                 )
             }
         </AnimatePresence>
+        <style jsx>{`
+        @keyframes scroll {
+          0% {
+            transform: translateX(100%);
+          }
+          100% {
+            transform: translateX(-100%);
+          }
+        }
+        .animate-scroll {
+          animation: scroll 20s linear infinite;
+        }
+      `}</style>
     </>
   )
 }

@@ -6,6 +6,8 @@ import { Search } from "lucide-react";
 import { RiSearch2Line } from "react-icons/ri";
 import TrackList from "./TrackList";
 import { currentTrackContext, PlayerContext } from '@/context/PlayerContext';
+import { RxCross2 } from "react-icons/rx";
+
 
 
 const SearchScreen = () => {
@@ -28,7 +30,7 @@ const SearchScreen = () => {
         `/api/search?query=${encodeURIComponent(updatedSearchQuery)}`
       );
       const data = await response.json();
-      setSearchResults(data.results.slice(0, 1) || []);
+      setSearchResults(data.results.slice(0, 5) || []);
       console.log("Search results:", data.results);
     } catch (error) {
       console.error("Error fetching search results:", error);
@@ -74,6 +76,14 @@ const SearchScreen = () => {
                 value={searchQuery}
                 onChange={(e) => {setSearchQuery(e.target.value); setSearchPerformed(false)}}
                 onKeyDown={handleKeyDown}
+              />
+              <RxCross2
+                className={`absolute right-10 text-gray-500 cursor-pointer ${searchQuery ? 'block' : 'hidden'}`}
+                onClick={() => {
+                  setSearchQuery("");
+                  setSearchResults([]);
+                  setSearchPerformed(false);
+                }}
               />
               <RiSearch2Line className="absolute left-9 text-gray-500" />
             </div>
