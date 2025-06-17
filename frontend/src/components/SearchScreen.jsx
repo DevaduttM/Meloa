@@ -5,7 +5,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import { Search } from "lucide-react";
 import { RiSearch2Line } from "react-icons/ri";
 import TrackList from "./TrackList";
-import { currentTrackContext, PlayerContext } from '@/context/PlayerContext';
+import { currentTrackContext, GenreScreenContext, PlayerContext } from '@/context/PlayerContext';
 import { RxCross2 } from "react-icons/rx";
 import TrackShimmer from "./TrackShimmer";
 
@@ -15,7 +15,7 @@ const SearchScreen = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [searchResults, setSearchResults] = useState([]);
   const [searchPerformed, setSearchPerformed] = useState(false);
-
+  const [loading, setLoading] = useState(false);
 
   const handleKeyDown = (event) => {
     if (event.key === "Enter") {
@@ -25,6 +25,7 @@ const SearchScreen = () => {
   };
 
   const handleSearch = async () => {
+    setLoading(true);
     var updatedSearchQuery = searchQuery.trim() + " music video";
     try {
       const response = await fetch(
@@ -37,13 +38,14 @@ const SearchScreen = () => {
       console.error("Error fetching search results:", error);
     }
     setSearchPerformed(true);
+    setLoading(false);
   };
 
   const player = useContext(PlayerContext);
 
   return (
     <>
-
+    <GenreScreenContext.Provider value={{ openGenre: false, setOpenGenre: () => {} }}>
       <AnimatePresence>
         <div className="h-screen w-screen flex justify-start items-center bg-[#171717] flex-col relative overflow-x-hidden overflow-y-scroll scrollbar-hide">
           <div className="top-0 w-full flex justify-between px-3 pt-7 items-center">
@@ -93,10 +95,16 @@ const SearchScreen = () => {
                 {searchQuery ? (
                   <>
                     <div className={`text-gray-500 text-lg font-syne mt-4 h-full justify-start flex-col items-center pt-6 px-5 ${searchResults.length > 0 && searchPerformed == true ? 'hidden' : ''}`}>
-                      {
-                        [...Array(5)].map((_, index) => (
-                          <TrackShimmer key={index} />
-                        ))}
+                      <h1 className={` ${loading ? 'hidden' : 'text-gray-500 text-lg font-syne mt-4'}`}>Searching for {searchQuery}</h1>
+                      {loading && 
+                        <>
+                          {
+                            [...Array(5)].map((_, index) => {
+                              return <TrackShimmer key={index} />;
+                            })
+                          }
+                        </>
+                      }
                     </div>
                     {searchResults.length > 0 && searchPerformed == true ? (
                       <div className="w-screen h-full gap-4 px-5 overflow-y-scroll scrollbar-hide flex flex-col items-center mt-10">
@@ -105,7 +113,7 @@ const SearchScreen = () => {
                             width="w-full"
                             key={index}
                             data={result}
-                            
+                            index={index}
                           />
                         ))}
                       </div>
@@ -129,6 +137,7 @@ const SearchScreen = () => {
           </motion.div>
         </div>
       </AnimatePresence>
+    </GenreScreenContext.Provider>
     </>
   );
 };

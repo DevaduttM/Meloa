@@ -30,7 +30,7 @@ export const handleFetchNext = async (data, track, play) => {
     if (audioData && audioData.audioUrl) {
       track.setAudioUrl((prev) => [...prev, audioData.audioUrl]);
       console.log("Next video URL set:", audioData.audioUrl);
-        play.setPlaying(true);
+        // play.setPlaying(true);
     } else {
       console.error("No next video URL found in response");
     }

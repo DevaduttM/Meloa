@@ -1,6 +1,6 @@
 import React, { use, useContext, useEffect, useState } from "react";
 import Image from "next/image";
-import { currentTrackContext } from "@/context/PlayerContext";
+import { currentTrackContext, GenreScreenContext, PlayFromPlaylistContext, PlaylistContext } from "@/context/PlayerContext";
 import { PlayerContext } from "@/context/PlayerContext";
 import Lottie from "lottie-react";
 import animationFile from "@/assets/play_animation.json";
@@ -8,25 +8,42 @@ import { AnimatePresence, motion } from "framer-motion";
 import { handleFetchAudio } from "@/utils/apicalls";
 
 
-const TrackList = ({ width, data }) => {
+const TrackList = ({ width, data, index }) => {
   const track = useContext(currentTrackContext);
   const player = useContext(PlayerContext);
+  const playlstOpenCtx = useContext(PlaylistContext);
+  const playfromplst = useContext(PlayFromPlaylistContext);
+  const genrectx = useContext(GenreScreenContext);
 
   useEffect(() => {
-    console.log("TrackList data:", data);
-    console.log("Current track context:", track);
+    // console.log("TrackList data:", data);
+    // console.log("Current track context:", track);
   }, [data, track]);
 
   const handleTrackClick = () => {
-    track.setCurrentTrack(prev => [...prev, data]);
-    track.setCurrentIndex(prev => prev + 1 );
-    player.setPlayerOpen(true);
-    console.log("Setting current track to:", data);
-    handleFetchAudio(data, track, player);
-
-    setTimeout(() => {
-      console.log("Track context after setting:", track);
-    }, 100);
+    if( genrectx.openGenre ){
+      playfromplst.setPlayingFromPlaylist(true);
+      const trackIndex = playfromplst.playlistSongs.findIndex(
+        (track) => track.id === data.id
+      );
+      track.setCurrentTrack(prev => [...prev, playfromplst.playlistSongs[trackIndex]]);
+      track.setCurrentIndex(prev => prev + 1 );
+      playfromplst.setPlaylistIndex(trackIndex);
+      player.setPlayerOpen(true);
+      handleFetchAudio(data, track, player);
+    }
+    else{
+      playfromplst.setPlayingFromPlaylist(false);
+      track.setCurrentTrack(prev => [...prev, data]);
+      track.setCurrentIndex(prev => prev + 1 );
+      player.setPlayerOpen(true);
+      console.log("Setting current track to:", data);
+      handleFetchAudio(data, track, player);
+  
+      setTimeout(() => {
+        console.log("Track context after setting:", track);
+      }, 100);
+    }
   };
 
 
@@ -45,7 +62,7 @@ const TrackList = ({ width, data }) => {
             className="rounded-lg object-cover bg-[#1f1f1f] shadow-lg"
           />
           <AnimatePresence>
-            {track.currentTrack?.id === data.id &&
+            {track.currentTrack?.[track?.currentIndex]?.id === data.id &&
             player.playerOpen &&
             player.playing ? (
               <motion.div

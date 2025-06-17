@@ -3,13 +3,17 @@ import Image from "next/image";
 import { AnimatePresence, motion } from "framer-motion";
 import { FaRegCircleUser } from "react-icons/fa6";
 import { IoMdMore } from "react-icons/io";
-import { PlayerContext, currentTrackContext } from "@/context/PlayerContext";
+import { PlayerContext, GenreScreenContext, currentTrackContext } from "@/context/PlayerContext";
 import TrackList from "./TrackList";
 import { handleFetchAudio } from "@/utils/apicalls";
+import PlaylistScreen from "./PlaylistScreen";
+import GenreScreen from "./GenreScreen";
 
 const HomeScreen = ({trendingSongs}) => {
   const [shuffledGenres, setShuffledGenres] = useState([]);
   const [chunks, setChunks] = useState([]);
+  const [openGenre, setOpenGenre] = useState(false);
+  const [genreScreenDetails, setGenreScreenDetails] = useState(null);
 
   const player = useContext(PlayerContext);
   const track = useContext(currentTrackContext);
@@ -20,54 +24,73 @@ const HomeScreen = ({trendingSongs}) => {
       image: "/pop_cover.jpg",
       gradientFrom: "#EC4899",
       gradientTo: "#8B5CF6",
+      id: "PLplXQ2cg9B_qrCVd1J_iId5SvP8Kf_BfS"
     },
     {
       name: "Hip-Hop",
       image: "/hiphop_cover.jpg",
       gradientFrom: "#1F2937",
       gradientTo: "#F59E0B",
+      id: "PL3-sRm8xAzY-556lOpSGH6wVzyofoGpzU"
     },
     {
       name: "Rock",
       image: "/rock_cover.jpg",
       gradientFrom: "#B91C1C",
       gradientTo: "#000000",
+      id: "PLVQ7g3e6O27cH8KG9mktLWH8zcqiwTntP"
     },
     {
       name: "Electronic",
       image: "/edm_cover.jpg",
       gradientFrom: "#22D3EE",
       gradientTo: "#2563EB",
+      id: "PLQdn7YisXz3Nzy1sgAMMXA8P4Qd-RMGL7"
     },
     {
-      name: "Jazz",
-      image: "/jazz_cover.jpg",
+      name: "Bollywood",
+      image: "/bollywood_cover.jpg",
       gradientFrom: "#FCD34D",
       gradientTo: "#D97706",
+      id: "PL9bw4S5ePsEEqCMJSiYZ-KTtEjzVy0YvK"
     },
     {
       name: "Classical",
       image: "/classical_cover.jpg",
       gradientFrom: "#D1D5DB",
       gradientTo: "#6B7280",
+      id: "PLO_1AmtK1TMRi01-V_tdHKDLBu7cNWIgf"
     },
   ];
 
   useEffect(() => {
-    const shuffledGenre = getShuffledArray(genreDetails);
-    setShuffledGenres(shuffledGenre);
-  }, []);
+    const handlePopState = (event) => {
+      if (openGenre) {
+        setOpenGenre(false);
+      }
+    };
+      window.addEventListener("popstate", handlePopState);
+    return () => {
+      window.removeEventListener("popstate", handlePopState);
+    };
+  }, [openGenre]);
 
-  function getShuffledArray(array) {
-    return [...array].sort(() => Math.random() - 0.5);
-  }
+  // useEffect(() => {
+  //   const shuffledGenre = getShuffledArray(genreDetails);
+  //   setShuffledGenres(shuffledGenre);
+  // }, [null]);
 
-  console.log("Trending Songs:", trendingSongs);
+  // function getShuffledArray(array) {
+  //   return [...array].sort(() => Math.random() - 0.5);
+  // }
+
+  // console.log("Trending Songs:", trendingSongs);
 
 
 
   return (
     <>
+    <GenreScreenContext.Provider value={{ openGenre, setOpenGenre }}>
       <AnimatePresence>
         <div className="h-screen w-screen flex justify-start items-center bg-[#171717] flex-col relative overflow-x-hidden overflow-y-scroll scrollbar-hide">
           <div className="top-0 w-full flex justify-between px-3 pt-7 items-center">
@@ -110,6 +133,7 @@ const HomeScreen = ({trendingSongs}) => {
                       <TrackList
                         data={item}
                         width="w-full"
+                        index={index}
                       />
                     </div>
                   ))}
@@ -121,8 +145,9 @@ const HomeScreen = ({trendingSongs}) => {
               Popular Genres
             </h1>
             <div className="relative w-full grid grid-cols-2 grid-rows-3 gap-4 pl-3 pr-5 mt-8">
-              {shuffledGenres.map((genre, index) => (
+              {genreDetails.map((genre, index) => (
                 <div
+                onClick={() => {setOpenGenre(true); window.history.pushState({}, null); setGenreScreenDetails(genre);}}
                   key={index}
                   className="relative rounded-lg h-25 w-full m-1 flex justify-center items-center overflow-hidden"
                   style={{
@@ -137,6 +162,7 @@ const HomeScreen = ({trendingSongs}) => {
                     className="absolute -right-4 -bottom-4 rounded-sm h-16 w-16 object-cover -rotate-45"
                   />
                   <h2 className="text-white text-lg font-syne">{genre.name}</h2>
+                  
                 </div>
               ))}
             </div>
@@ -181,6 +207,14 @@ const HomeScreen = ({trendingSongs}) => {
           </motion.div>
         </div>
       </AnimatePresence>
+      <AnimatePresence>
+      {
+                    openGenre ? (
+                      <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className=""><GenreScreen data={genreScreenDetails} /></motion.div>
+                    ) : null
+                  }
+      </AnimatePresence>
+      </GenreScreenContext.Provider >
     </>
   );
 };

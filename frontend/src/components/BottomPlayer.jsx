@@ -1,9 +1,13 @@
-import React, { useContext, useEffect, useState, useRef } from "react";
+import React, { useContext, useEffect, useState, useRef, use } from "react";
 import { FaPlay } from "react-icons/fa6";
 import { FaPause } from "react-icons/fa6";
 import { PiFastForwardFill } from "react-icons/pi";
 import { PiRewindFill } from "react-icons/pi";
-import { currentTrackContext, PlayerContext } from "@/context/PlayerContext";
+import {
+  currentTrackContext,
+  PlayerContext,
+  PlayFromPlaylistContext,
+} from "@/context/PlayerContext";
 import { IoArrowBack } from "react-icons/io5";
 import { IoMdHeartEmpty } from "react-icons/io";
 import { IoMdHeart } from "react-icons/io";
@@ -25,6 +29,8 @@ const BottomPlayer = () => {
   const barRef = useRef(null);
 
   const playState = useContext(PlayerContext);
+  const fromplaylstctx = useContext(PlayFromPlaylistContext);
+
   const [openMainPlayer, setOpenMainPlayer] = useState(false);
   const [like, setLike] = useState(false);
   const [playlistScreen, setPlaylistScreen] = useState(false);
@@ -51,15 +57,16 @@ const BottomPlayer = () => {
   const track = useContext(currentTrackContext);
 
   useEffect(() => {
-    let hasFetchedRelated = false;
-
     const audio = ref.current;
     if (!audio) return;
+
+    let hasFetchedRelated = false;
 
     const updateProgress = () => {
       if (audio.duration) {
         const currentProgress = (audio.currentTime / audio.duration) * 100;
         setProgress(currentProgress);
+        console.log("ref: ", hasFetchedRelated);
         if (currentProgress >= 90 && !hasFetchedRelated) {
           hasFetchedRelated = true;
           fetchRelatedVideo(track?.currentTrack[track?.currentIndex]?.id);
@@ -68,14 +75,22 @@ const BottomPlayer = () => {
     };
 
     const onEnded = () => {
-      const nextIndex = track?.currentIndex + 1;
       playState.setPlaying(false);
       setProgress(0);
-      track.setCurrentIndex((prevIndex) => prevIndex + 1);
-      console.log("Current Track Index:", track?.currentIndex);
-      console.log("Current Track:", track?.currentTrack[track?.currentIndex]);
-      handleFetchNext(nextTrack, track, playState);
-      track.setCurrentTrack((prev) => [...prev, nextTrack]);
+
+      const nextIndex = track?.currentIndex + 1;
+
+      if (fromplaylstctx.playingFromPlaylist) {
+        const nextPlaylistIndex =
+          (fromplaylstctx?.playlistIndex + 1) %
+          fromplaylstctx?.playlistSongs?.length;
+        const nextTrack = fromplaylstctx?.playlistSongs[nextPlaylistIndex];
+        track.setCurrentIndex(nextIndex);
+        fromplaylstctx.setPlaylistIndex(nextPlaylistIndex);
+
+        console.log("Next Track Index:", nextIndex);
+        console.log("Next Track:", nextTrack);
+      }
     };
 
     const onPlay = () => playState.setPlaying(true);
@@ -94,22 +109,38 @@ const BottomPlayer = () => {
       audio.removeEventListener("pause", onPause);
       audio.removeEventListener("loadedmetadata", updateProgress);
     };
-  }, [track?.audioUrl, playState]);
+  }, [track?.currentTrack?.[track?.currentIndex]]);
 
   const fetchRelatedVideo = async (id) => {
-    try {
-      const response = await fetch(`/api/nextvideo?id=${id}`);
-      const data = await response.json();
-      if (data && data.related) {
-        setNextTrack(data.related[0]);
-        playState.setPlaying(true);
-        ref.current.play();
-        console.log("Related video set:", data.related[0]);
-      } else {
-        console.error("No related video found in response");
+    if (fromplaylstctx.playingFromPlaylist) {
+      console.log("Playing from playlist, skipping related video fetch.");
+      const nextIndex =
+        (fromplaylstctx.playlistIndex + 1) %
+        fromplaylstctx.playlistSongs.length;
+        track.setCurrentTrack((prev) => [...prev, fromplaylstctx.playlistSongs[nextIndex]]);
+        handleFetchNext(
+        fromplaylstctx.playlistSongs[nextIndex],
+        track,
+        playState
+      );
+      return;
+    } else {
+      try {
+        const response = await fetch(`/api/nextvideo?id=${id}`);
+        const data = await response.json();
+        if (data && data.related) {
+          setNextTrack(data.related[0]);
+          handleFetchNext(data.related[0], track, playState);
+          track.setCurrentTrack((prev) => [...prev, data.related[0]]);
+          playState.setPlaying(true);
+          ref.current.play();
+          console.log("Related video set:", data.related[0]);
+        } else {
+          console.error("No related video found in response");
+        }
+      } catch (error) {
+        console.error("Error fetching related video:", error);
       }
-    } catch (error) {
-      console.error("Error fetching related video:", error);
     }
   };
 
@@ -125,69 +156,104 @@ const BottomPlayer = () => {
     setProgress(percentage);
   };
 
-  console.log("URLs: ", track?.audioUrl);
+  // console.log("URLs: ", track?.audioUrl);
 
+  const handleNextClick = async () => {
+    if (ref.current) {
+      ref.current.pause();
+    }
 
-const handleNextClick = async () => {
-  ref.current.pause();
-  playState.setPlaying(false);
-  setProgress(0);
+    playState.setPlaying(false);
+    setProgress(0);
 
-  const currentTrack = track.currentTrack[track.currentIndex];
-  const id = currentTrack?.id;
+    const currentTrack = track.currentTrack[track.currentIndex];
+    const id = currentTrack?.id;
 
-  if (!id) {
-    console.error("No current track ID found");
-    return;
-  }
-
-  try {
-    const response = await fetch(`/api/nextvideo?id=${id}`);
-    const data = await response.json();
-
-    if (!data || !data.related || data.related.length === 0) {
-      console.error("No related video found");
+    if (!id) {
+      console.error("No current track ID found");
       return;
     }
 
-    const nextTrack = data.related[0];
+    if (
+      track.currentIndex < track.currentTrack.length - 1 &&
+      !fromplaylstctx.playingFromPlaylist
+    ) {
+      const nextIndex = track.currentIndex + 1;
+      track.setCurrentIndex(nextIndex);
 
-    track.setCurrentTrack((prev) => [...prev, nextTrack]);
-    track.setCurrentIndex((prevIndex) => prevIndex + 1);
+      ref.current.play();
+      playState.setPlaying(true);
 
-    await handleFetchNext(nextTrack, track, playState);
+      console.log("Next Track Index:", track.currentIndex);
+      console.log("Next Track:", track.currentTrack[track.currentIndex]);
+      return;
+    } else if (fromplaylstctx.playingFromPlaylist) {
+      const nextIndex = track.currentIndex + 1;
+      const nextPlaylistIndex =
+        (fromplaylstctx.playlistIndex + 1) %
+        fromplaylstctx.playlistSongs.length;
+      const nextTrack = fromplaylstctx.playlistSongs[nextPlaylistIndex];
+      handleFetchNext(nextTrack, track, playState);
+      track.setCurrentTrack((prev) => [...prev, nextTrack]);
+      track.setCurrentIndex(nextIndex);
+      fromplaylstctx.setPlaylistIndex(nextPlaylistIndex);
+      ref.current.play();
+      playState.setPlaying(true);
+      return;
+    } else {
+      try {
+        const response = await fetch(`/api/nextvideo?id=${id}`);
+        const data = await response.json();
 
-    console.log("Next Track Appended:", nextTrack);
-  } catch (err) {
-    console.error("Error in handleNextClick:", err);
-  }
-};
+        if (!data || !data.related || data.related.length === 0) {
+          console.error("No related video found");
+          return;
+        }
 
-const handleRewindClick = async () => {
-  if (track.currentIndex <= 0) {
-    console.warn("Already at the first track. Cannot rewind further.");
-    return;
-  }
+        const nextTrack = data.related[0];
 
-  // Pause current playback and reset progress
-  playState.setPlaying(false);
-  setProgress(0);
+        track.setCurrentTrack((prev) => [...prev, nextTrack]);
+        track.setCurrentIndex((prevIndex) => prevIndex + 1);
 
-  // Move to previous track
-  track.setCurrentIndex((prevIndex) => prevIndex - 1);
+        await handleFetchNext(nextTrack, track, playState);
 
-  // Wait a moment for currentIndex state to update before playing
-  setTimeout(() => {
-    ref.current.load();   // Reload the <audio> element source
-    ref.current.play();   // Start playback
-    playState.setPlaying(true);
+        console.log("Next Track Appended:", nextTrack);
+      } catch (err) {
+        console.error("Error in handleNextClick:", err);
+      }
+    }
+  };
 
-    console.log("Rewound to Track Index:", track.currentIndex - 1);
-    console.log("Track:", track.currentTrack[track.currentIndex - 1]);
-  }, 0);
-};
+  const handleRewindClick = async () => {
+    if (fromplaylstctx.playingFromPlaylist) {
+      setProgress(0);
+      ref.current.currentTime = 0;
+    } else {
+      if (track.currentIndex <= 0) {
+        console.warn("Already at the first track. Cannot rewind further.");
+        return;
+      }
 
+      if (ref.current.currentTime < 5) {
+        playState.setPlaying(false);
+        setProgress(0);
 
+        track.setCurrentIndex((prevIndex) => prevIndex - 1);
+
+        setTimeout(() => {
+          ref.current.load();
+          ref.current.play();
+          playState.setPlaying(true);
+
+          console.log("Rewound to Track Index:", track.currentIndex - 1);
+          console.log("Track:", track.currentTrack[track.currentIndex - 1]);
+        }, 0);
+      } else {
+        setProgress(0);
+        ref.current.currentTime = 0;
+      }
+    }
+  };
 
   return (
     <>
@@ -369,7 +435,10 @@ const handleRewindClick = async () => {
                 </span>
               </div>
               <div className="w-[70%] flex justify-around items-center">
-                <button onClick={handleRewindClick} className="open-buttons text-white text-5xl">
+                <button
+                  onClick={handleRewindClick}
+                  className="open-buttons text-white text-5xl"
+                >
                   <PiRewindFill />
                 </button>
                 {playState.playing ? (
@@ -393,7 +462,10 @@ const handleRewindClick = async () => {
                     <FaPlay />
                   </button>
                 )}
-                <button onClick={handleNextClick} className="open-buttons text-white text-5xl">
+                <button
+                  onClick={handleNextClick}
+                  className="open-buttons text-white text-5xl"
+                >
                   <PiFastForwardFill />
                 </button>
               </div>
@@ -432,7 +504,9 @@ const handleRewindClick = async () => {
                   )}
                 </AnimatePresence>
                 <a
-                  href={`http://192.168.1.7:5000/download?id=${track.currentTrack.id}`}
+                  href={`http://192.168.1.7:5000/download?id=${
+                    track?.currentTrack?.[track?.currentIndex]?.id
+                  }`}
                   rel="noopener noreferrer"
                   className="open-buttons text-white text-3xl"
                 >

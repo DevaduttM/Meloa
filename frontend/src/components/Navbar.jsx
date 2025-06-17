@@ -9,7 +9,7 @@ import LibraryScreen from "./LibraryScreen";
 import { motion } from "framer-motion";
 import BottomPlayer from "./BottomPlayer";
 import HomeScreenShimmer from "./HomeScreenShimmer";
-import { PlayerContext, currentTrackContext } from "@/context/PlayerContext";
+import { PlayerContext, currentTrackContext, PlayFromPlaylistContext } from "@/context/PlayerContext";
 import Image from "next/image";
 import { FaRegCircleUser } from "react-icons/fa6";
 
@@ -23,6 +23,9 @@ const Navbar = () => {
   const [trendingSongs, setTrendingSongs] = useState([]);
   const [chunks, setChunks] = useState([]);
   const [currentIndex, setCurrentIndex] = useState(-1);
+  const [playingFromPlaylist, setPlayingFromPlaylist] = useState(false);
+  const [playlistSongs, setPlaylistSongs] = useState([]);
+  const [playlistIndex, setPlaylistIndex] = useState(0);
 
   useEffect(() => {
     const handleTrendingSearch = async () => {
@@ -35,8 +38,8 @@ const Navbar = () => {
           "/api/playlist?id=PL4QNnZJr8sRPEJPqe7jZnsLPTBu1E3nIY"
         );
         const dataMal = await responseMal.json();
-        console.log("Trending data World:", dataWorld);
-        console.log("Trending data Malayalam:", dataMal);
+        // console.log("Trending data World:", dataWorld);
+        // console.log("Trending data Malayalam:", dataMal);
         setTrendingSongs([...dataWorld.results || [], ...dataMal.results || []]);
         setLoading(false);
       } catch (error) {
@@ -59,7 +62,7 @@ const chunkArray = (arr, size) => {
       console.log(shuffledTrending.slice(i, i + size));
       trending_grouped.push(shuffledTrending.slice(i, i + size));
     }
-    console.log("Chunked Trending Songs:", trending_grouped);
+    // console.log("Chunked Trending Songs:", trending_grouped);
     return trending_grouped;
   };
   const chunks = chunkArray(trendingSongs, 3);
@@ -71,7 +74,8 @@ const chunkArray = (arr, size) => {
       <PlayerContext.Provider
         value={{ playing, setPlaying, playerOpen, setPlayerOpen }}
       >
-        <currentTrackContext.Provider value={{currentTrack, setCurrentTrack, audioUrl, setAudioUrl, currentIndex, setCurrentIndex}}> 
+        <currentTrackContext.Provider value={{currentTrack, setCurrentTrack, audioUrl, setAudioUrl, currentIndex, setCurrentIndex}}>
+        <PlayFromPlaylistContext.Provider value={{playingFromPlaylist, setPlayingFromPlaylist, playlistSongs, setPlaylistSongs, playlistIndex, setPlaylistIndex}}>
         <div className="h-screen w-screen flex justify-center flex-col items-center bg-[#171717]">
           {page === "home" && loading ? (
             <HomeScreenShimmer />
@@ -195,6 +199,7 @@ const chunkArray = (arr, size) => {
             {playerOpen && <BottomPlayer />}
           </div>
         }
+        </PlayFromPlaylistContext.Provider>
         </currentTrackContext.Provider>
       </PlayerContext.Provider>
     </>
