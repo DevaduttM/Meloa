@@ -21,7 +21,7 @@ const PlaylistScreen = () => {
 
   return (
     <>
-      <div className="z-50 min-h-screen w-screen bg-[#171717] flex flex-col fixed top-0 left-0">
+      <div className="z-0 min-h-screen w-screen bg-[#171717] flex flex-col fixed top-0 left-0">
           <IoArrowBack
             onClick={() => playlistctx.setOpenPlaylistScreen(false)}
             className="fixed top-7 z-60 left-5 text-4xl text-white"
@@ -59,14 +59,11 @@ const PlaylistScreen = () => {
                 </span>
               </button>
             </div>
-            <div className="w-full flex flex-col mt-10 justify-start items-center pb-24">
+            <div className="w-full flex flex-col mt-10 justify-start items-center pb-35">
               {[...Array(10)].map((_, index) => (
                 <div
                   key={index}
-                  onClick={() => {
-                    playerctx.setPlayerOpen(true);
-                    playerctx.setPlaying(true);
-                  }}
+                  
                   className="w-[90%] flex justify-start items-center p-2 rounded-lg "
                 >
                   <div className="flex justify-center items-center">
@@ -79,9 +76,6 @@ const PlaylistScreen = () => {
               ))}
             </div>
           </div>
-            <div className="z-100 w-full flex justify-center items-center mb-5 fixed bottom-0 left-0">
-              {playerctx.playerOpen && <BottomPlayer />}
-            </div>
         </motion.div>
       </div>
     </>

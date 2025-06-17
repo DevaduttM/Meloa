@@ -18,10 +18,11 @@ const Navbar = () => {
   const [loading, setLoading] = useState(true);
   const [playerOpen, setPlayerOpen] = useState(false);
   const [playing, setPlaying] = useState(false);
-  const [currentTrack, setCurrentTrack] = useState(null);
-  const [audioUrl, setAudioUrl] = useState(null);
+  const [currentTrack, setCurrentTrack] = useState([]);
+  const [audioUrl, setAudioUrl] = useState([]);
   const [trendingSongs, setTrendingSongs] = useState([]);
   const [chunks, setChunks] = useState([]);
+  const [currentIndex, setCurrentIndex] = useState(-1);
 
   useEffect(() => {
     const handleTrendingSearch = async () => {
@@ -70,7 +71,7 @@ const chunkArray = (arr, size) => {
       <PlayerContext.Provider
         value={{ playing, setPlaying, playerOpen, setPlayerOpen }}
       >
-        <currentTrackContext.Provider value={{currentTrack, setCurrentTrack, audioUrl, setAudioUrl}}> 
+        <currentTrackContext.Provider value={{currentTrack, setCurrentTrack, audioUrl, setAudioUrl, currentIndex, setCurrentIndex}}> 
         <div className="h-screen w-screen flex justify-center flex-col items-center bg-[#171717]">
           {page === "home" && loading ? (
             <HomeScreenShimmer />
@@ -94,7 +95,7 @@ const chunkArray = (arr, size) => {
                   transition={{ duration: 0.2 }}
                 >
                   <AiFillHome
-                    className={`text-xl ${
+                    className={`nav-icons text-xl ${
                       page === "home" ? "text-[#27df6a]" : "white"
                     }`}
                   />
@@ -106,7 +107,7 @@ const chunkArray = (arr, size) => {
                   exit={{ opacity: 0 }}
                   transition={{ duration: 0.2 }}
                 >
-                  <AiOutlineHome className={`text-xl text-white`} />
+                  <AiOutlineHome className={`nav-icons text-xl text-white`} />
                 </motion.div>
               )}
               <span
@@ -129,7 +130,7 @@ const chunkArray = (arr, size) => {
                   transition={{ duration: 0.2 }}
                 >
                   <RiSearch2Fill
-                    className={`text-xl ${
+                    className={`nav-icons text-xl ${
                       page === "search" ? "text-[#27df6a]" : "white"
                     } `}
                   />
@@ -141,7 +142,7 @@ const chunkArray = (arr, size) => {
                   exit={{ opacity: 0 }}
                   transition={{ duration: 0.2 }}
                 >
-                  <RiSearch2Line className={`text-xl text-white`} />
+                  <RiSearch2Line className={`nav-icons text-xl text-white`} />
                 </motion.div>
               )}
               <span
@@ -164,7 +165,7 @@ const chunkArray = (arr, size) => {
                   transition={{ duration: 0.2 }}
                 >
                   <MdVideoLibrary
-                    className={`text-xl ${
+                    className={`text-xl nav-icons ${
                       page === "library" ? "text-[#27df6a]" : "white"
                     }`}
                   />
@@ -176,7 +177,7 @@ const chunkArray = (arr, size) => {
                   exit={{ opacity: 0 }}
                   transition={{ duration: 0.2 }}
                 >
-                  <MdOutlineVideoLibrary className={`text-xl text-white`} />
+                  <MdOutlineVideoLibrary className={`nav-icons text-xl text-white`} />
                 </motion.div>
               )}
               <span
@@ -190,7 +191,7 @@ const chunkArray = (arr, size) => {
           </div>
         </div>
         {
-          <div className="fixed bottom-20 w-full flex justify-center items-center right-0">
+          <div className="fixed bottom-[7.4%] w-full flex justify-center items-center right-0">
             {playerOpen && <BottomPlayer />}
           </div>
         }

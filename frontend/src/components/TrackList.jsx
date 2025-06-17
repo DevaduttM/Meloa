@@ -18,7 +18,8 @@ const TrackList = ({ width, data }) => {
   }, [data, track]);
 
   const handleTrackClick = () => {
-    track.setCurrentTrack(data);
+    track.setCurrentTrack(prev => [...prev, data]);
+    track.setCurrentIndex(prev => prev + 1 );
     player.setPlayerOpen(true);
     console.log("Setting current track to:", data);
     handleFetchAudio(data, track, player);
@@ -64,10 +65,10 @@ const TrackList = ({ width, data }) => {
           </AnimatePresence>
         </div>
         <div className="flex flex-col">
-          <h1 className="text-white text-md font-syne">
+          <h1 className="text-white text-md font-syne track-title">
             {data.title.split(/[\(\[\|]/)[0].trim() || "Track Title"}
           </h1>
-          <h2 className="text-gray-400 text-sm font-syne">
+          <h2 className="text-gray-400 text-sm font-syne track-channel">
             {data.channel || "Channel Name"}
           </h2>
         </div>

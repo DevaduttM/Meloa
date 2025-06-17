@@ -100,7 +100,7 @@ const HomeScreen = ({trendingSongs}) => {
               {trendingSongs.map((chunk, outerIndex) => (
                 <div
                   key={outerIndex}
-                  className="min-w-[65vw] flex-col gap-5 h-full flex justify-between items-center mr-4"
+                  className="home-trending min-w-[65vw] flex-col gap-5 h-full flex justify-between items-center mr-4"
                 >
                   {chunk.map((item, index) => (
                     <div

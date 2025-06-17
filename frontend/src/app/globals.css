@@ -72,4 +72,58 @@ body {
   .track-title {
     font-size: 14px;
   }
+
+  .track-title-open {
+    font-size: 18px;
+  }
+
+  .track-channel-open {
+    font-size: 14px;
+  }
+
+  .track-channel {
+    font-size: 12px;
+  }
+
+  .home-trending {
+    gap: 2px;
+  }
+
+  .track-details-open {
+    margin-bottom: 0.5rem;
+  }
+
+  .progress-bottom {
+    height: 0.2rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .time-container {
+    height: 0.2rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .time-text {
+    font-size: 0.8rem;
+  }
+
+  .open-buttons{
+    font-size: 1.5rem;
+  }
+
+  .open-play-btn {
+    font-size: 2rem;
+  }
+
+  .open-bottom-icons {
+    bottom: 1.5rem;
+  }
+
+  .close-data{
+    gap: 0.5rem;
+  }
+
+  .nav-icons{
+    font-size: 0.9rem
+  }
 }
