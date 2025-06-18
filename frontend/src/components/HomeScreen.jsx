@@ -3,7 +3,7 @@ import Image from "next/image";
 import { AnimatePresence, motion } from "framer-motion";
 import { FaRegCircleUser } from "react-icons/fa6";
 import { IoMdMore } from "react-icons/io";
-import { PlayerContext, GenreScreenContext, currentTrackContext } from "@/context/PlayerContext";
+import { PlayerContext, GenreScreenContext, currentTrackContext, PlaylistContext } from "@/context/PlayerContext";
 import TrackList from "./TrackList";
 import { handleFetchAudio } from "@/utils/apicalls";
 import PlaylistScreen from "./PlaylistScreen";
@@ -120,6 +120,7 @@ const HomeScreen = ({trendingSongs}) => {
   return (
     <>
     <GenreScreenContext.Provider value={{ openGenre, setOpenGenre }}>
+      <PlaylistContext.Provider value={{ openPlaylistScreen: false, setOpenPlaylistScreen: () => {} }}>
       <AnimatePresence>
         <div className="h-screen w-screen flex justify-start items-center bg-[#171717] flex-col relative overflow-x-hidden overflow-y-scroll scrollbar-hide">
           <div className="top-0 w-full flex justify-between px-3 pt-7 items-center">
@@ -256,6 +257,7 @@ const HomeScreen = ({trendingSongs}) => {
                     ) : null
                   }
       </AnimatePresence>
+      </PlaylistContext.Provider>
       </GenreScreenContext.Provider >
     </>
   );
