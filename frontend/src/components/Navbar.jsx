@@ -9,9 +9,11 @@ import LibraryScreen from "./LibraryScreen";
 import { motion } from "framer-motion";
 import BottomPlayer from "./BottomPlayer";
 import HomeScreenShimmer from "./HomeScreenShimmer";
-import { PlayerContext, currentTrackContext, PlayFromPlaylistContext } from "@/context/PlayerContext";
+import { PlayerContext, currentTrackContext, PlayFromPlaylistContext, UserDetailsContext } from "@/context/PlayerContext";
 import Image from "next/image";
 import { FaRegCircleUser } from "react-icons/fa6";
+import withAuth from "@/lib/withAuth";
+import { getUserDetails } from "@/lib/firestore";
 
 const Navbar = () => {
   const [page, setPage] = useState("home");
@@ -26,6 +28,8 @@ const Navbar = () => {
   const [playingFromPlaylist, setPlayingFromPlaylist] = useState(false);
   const [playlistSongs, setPlaylistSongs] = useState([]);
   const [playlistIndex, setPlaylistIndex] = useState(0);
+  const [userDetails, setUserDetails] = useState(null);
+  const [likedSongs, setLikedSongs] = useState([]);
 
   useEffect(() => {
     const handleTrendingSearch = async () => {
@@ -48,6 +52,22 @@ const Navbar = () => {
     }
 
     handleTrendingSearch();
+  }, []);
+
+  useEffect(() => {
+    const fetchUserDetails = async () => {
+      const userDetails = JSON.parse(localStorage.getItem("user"));
+      const fetchedUserDetails = await getUserDetails(userDetails);
+      if (fetchedUserDetails) {
+        setUserDetails(fetchedUserDetails);
+        setLikedSongs(fetchedUserDetails.likedSongs || []);
+        console.log("User details from localStorage:", fetchedUserDetails);
+      } else {
+        setUserDetails(null);
+      }
+    };
+
+    fetchUserDetails();
   }, []);
 
     function getShuffledArray(array) {
@@ -76,6 +96,7 @@ const chunkArray = (arr, size) => {
       >
         <currentTrackContext.Provider value={{currentTrack, setCurrentTrack, audioUrl, setAudioUrl, currentIndex, setCurrentIndex}}>
         <PlayFromPlaylistContext.Provider value={{playingFromPlaylist, setPlayingFromPlaylist, playlistSongs, setPlaylistSongs, playlistIndex, setPlaylistIndex}}>
+          <UserDetailsContext.Provider value={{userDetails, setUserDetails, likedSongs, setLikedSongs}}>
         <div className="h-screen w-screen flex justify-center flex-col items-center bg-[#171717]">
           {page === "home" && loading ? (
             <HomeScreenShimmer />
@@ -199,6 +220,7 @@ const chunkArray = (arr, size) => {
             {playerOpen && <BottomPlayer />}
           </div>
         }
+        </UserDetailsContext.Provider>
         </PlayFromPlaylistContext.Provider>
         </currentTrackContext.Provider>
       </PlayerContext.Provider>
@@ -206,4 +228,4 @@ const chunkArray = (arr, size) => {
   );
 };
 
-export default Navbar;
+export default withAuth(Navbar);

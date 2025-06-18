@@ -8,15 +8,21 @@ import TrackList from "./TrackList";
 import { handleFetchAudio } from "@/utils/apicalls";
 import PlaylistScreen from "./PlaylistScreen";
 import GenreScreen from "./GenreScreen";
+import { auth } from "@/lib/firebase";
+import { useRouter } from "next/navigation";
+import withAuth from "@/lib/withAuth";
 
 const HomeScreen = ({trendingSongs}) => {
   const [shuffledGenres, setShuffledGenres] = useState([]);
   const [chunks, setChunks] = useState([]);
   const [openGenre, setOpenGenre] = useState(false);
   const [genreScreenDetails, setGenreScreenDetails] = useState(null);
+  const [userDetails, setUserDetails] = useState(null);
 
   const player = useContext(PlayerContext);
   const track = useContext(currentTrackContext);
+
+  const router = useRouter();
 
   const genreDetails = [
     {
@@ -64,6 +70,16 @@ const HomeScreen = ({trendingSongs}) => {
   ];
 
   useEffect(() => {
+    try{
+      const userDetails = JSON.parse(window.localStorage.getItem("user"));
+      setUserDetails(userDetails);
+    }
+    catch (error) {
+      console.error("Error parsing user details:", error);
+    }
+  }, []);
+
+  useEffect(() => {
     const handlePopState = (event) => {
       if (openGenre) {
         setOpenGenre(false);
@@ -74,6 +90,19 @@ const HomeScreen = ({trendingSongs}) => {
       window.removeEventListener("popstate", handlePopState);
     };
   }, [openGenre]);
+
+    const handleSignOut = async () => {
+    try {
+      await auth.signOut();
+      console.log("User signed out successfully");
+      window.localStorage.removeItem("user");
+      router.push('/signin');
+    }
+    catch (error) {
+      console.error("Error signing out:", error);
+      alert("Failed to sign out. Please try again.");
+    }
+  };
 
   // useEffect(() => {
   //   const shuffledGenre = getShuffledArray(genreDetails);
@@ -105,8 +134,21 @@ const HomeScreen = ({trendingSongs}) => {
                 Meloa
               </h1>
             </div>
-            <div className="w-fit h-full flex justify-center items-center gap-2">
-              <FaRegCircleUser className="text-3xl text-[#27df6a] mr-2" />
+            <div onClick={handleSignOut} className="w-fit h-full flex justify-center items-center gap-2">
+              {
+                userDetails?.photoURL ? (
+                  <div className="flex items-center gap-2">
+                    <Image
+                      src={userDetails.photoURL}
+                      alt="User Avatar"
+                      width={35}
+                      height={35}
+                      className="rounded-full"
+                    />
+                  </div>
+                ) : (
+                  <FaRegCircleUser className="text-3xl text-[#27df6a] mr-2" />
+                )}
             </div>
           </div>
           <motion.div

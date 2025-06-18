@@ -7,6 +7,7 @@ import {
   currentTrackContext,
   PlayerContext,
   PlayFromPlaylistContext,
+  UserDetailsContext,
 } from "@/context/PlayerContext";
 import { IoArrowBack } from "react-icons/io5";
 import { IoMdHeartEmpty } from "react-icons/io";
@@ -20,9 +21,11 @@ import { IoAdd } from "react-icons/io5";
 import { RiPlayListAddFill } from "react-icons/ri";
 import { PiPlaylist } from "react-icons/pi";
 import { handleFetchNext } from "@/utils/apicalls";
+import { fetchPlaylists, addSongToPlaylist, addLikedSong, removeLikedSong } from "@/lib/firestore";
 
 import Image from "next/image";
 import { Target } from "lucide-react";
+import { createPlaylist } from "@/lib/firestore";
 
 const BottomPlayer = () => {
   const ref = useRef(null);
@@ -30,6 +33,7 @@ const BottomPlayer = () => {
 
   const playState = useContext(PlayerContext);
   const fromplaylstctx = useContext(PlayFromPlaylistContext);
+  const userContext = useContext(UserDetailsContext);
 
   const [openMainPlayer, setOpenMainPlayer] = useState(false);
   const [like, setLike] = useState(false);
@@ -38,6 +42,8 @@ const BottomPlayer = () => {
   const [progress, setProgress] = useState(0);
   const [repeat, setRepeat] = useState(false);
   const [nextTrack, setNextTrack] = useState(null);
+  const [newPlaylistName, setNewPlaylistName] = useState("");
+  const [availablePlaylists, setAvailablePlaylists] = useState([]);
 
   const router = useRouter();
 
@@ -67,7 +73,7 @@ const BottomPlayer = () => {
         const currentProgress = (audio.currentTime / audio.duration) * 100;
         setProgress(currentProgress);
         console.log("ref: ", hasFetchedRelated);
-        if (currentProgress >= 90 && !hasFetchedRelated) {
+        if (currentProgress >= 90 && !hasFetchedRelated && !repeat) {
           hasFetchedRelated = true;
           fetchRelatedVideo(track?.currentTrack[track?.currentIndex]?.id);
         }
@@ -78,19 +84,29 @@ const BottomPlayer = () => {
       playState.setPlaying(false);
       setProgress(0);
 
-      const nextIndex = track?.currentIndex + 1;
+      if(!repeat) {
 
-      if (fromplaylstctx.playingFromPlaylist) {
-        const nextPlaylistIndex =
-          (fromplaylstctx?.playlistIndex + 1) %
-          fromplaylstctx?.playlistSongs?.length;
-        const nextTrack = fromplaylstctx?.playlistSongs[nextPlaylistIndex];
-        track.setCurrentIndex(nextIndex);
-        fromplaylstctx.setPlaylistIndex(nextPlaylistIndex);
-
-        console.log("Next Track Index:", nextIndex);
-        console.log("Next Track:", nextTrack);
+        const nextIndex = track?.currentIndex + 1;
+        if (fromplaylstctx.playingFromPlaylist) {
+          const nextPlaylistIndex =
+            (fromplaylstctx?.playlistIndex + 1) %
+            fromplaylstctx?.playlistSongs?.length;
+          const nextTrack = fromplaylstctx?.playlistSongs[nextPlaylistIndex];
+          track.setCurrentIndex(nextIndex);
+          fromplaylstctx.setPlaylistIndex(nextPlaylistIndex);
+  
+          console.log("Next Track Index:", nextIndex);
+          console.log("Next Track:", nextTrack);
+        }
+        else{
+          const nextTrack = track?.currentTrack[nextIndex];
+          track.setCurrentIndex(nextIndex);
+          console.log("Next Track Index:", nextIndex);
+          console.log("Next Track:", nextTrack);
+        }
       }
+
+
     };
 
     const onPlay = () => playState.setPlaying(true);
@@ -109,7 +125,7 @@ const BottomPlayer = () => {
       audio.removeEventListener("pause", onPause);
       audio.removeEventListener("loadedmetadata", updateProgress);
     };
-  }, [track?.currentTrack?.[track?.currentIndex]]);
+  }, [track?.currentTrack?.[track?.currentIndex], repeat]);
 
   const fetchRelatedVideo = async (id) => {
     if (fromplaylstctx.playingFromPlaylist) {
@@ -255,6 +271,45 @@ const BottomPlayer = () => {
     }
   };
 
+  console.log("Repeat:", repeat);
+
+  const createNewPlaylist = async (user, PlaylistName, song) => {
+    await createPlaylist(user, PlaylistName, song);
+    setNewPlaylistName("");
+    setCreatePlaylistScreen(false);
+    setPlaylistScreen(false);
+  }
+
+  const showPlaylists = async (user) => {
+    setPlaylistScreen(!playlistScreen);
+    const playlists = await fetchPlaylists(user);
+    setAvailablePlaylists(playlists);
+
+    console.log("User Playlists:", playlists);
+  }
+
+  const addToPlaylist = async (playlistId, song) => {
+    await addSongToPlaylist(userContext.userDetails, playlistId, song);
+    setPlaylistScreen(false);
+  }
+
+  const handleLikeClick = async() => {
+    if (like) {
+      setLike(false);
+      const updatedLikedSongs = userContext.likedSongs.filter(
+        (likedSong) => likedSong.id !== track.currentTrack[track.currentIndex].id
+      );
+      userContext.setLikedSongs(updatedLikedSongs);
+      await removeLikedSong(userContext.userDetails, track.currentTrack[track.currentIndex]);
+    }
+    else {
+      setLike(true);
+      const newLikedSong = track.currentTrack[track.currentIndex];
+      userContext.setLikedSongs((prev) => [...prev, newLikedSong]);
+      await addLikedSong(userContext.userDetails, newLikedSong);
+    }
+  }
+
   return (
     <>
       <audio
@@ -368,7 +423,7 @@ const BottomPlayer = () => {
                 <button
                   onClick={(e) => {
                     e.stopPropagation();
-                    setPlaylistScreen(!playlistScreen);
+                    showPlaylists(userContext.userDetails);
                   }}
                   className="open-buttons text-white text-3xl"
                 >
@@ -481,7 +536,7 @@ const BottomPlayer = () => {
                     >
                       <button
                         className="text-red-600 text-3xl"
-                        onClick={() => setLike(false)}
+                        onClick={handleLikeClick}
                       >
                         <IoMdHeart />
                       </button>
@@ -496,7 +551,7 @@ const BottomPlayer = () => {
                     >
                       <button
                         className="open-buttons text-white text-3xl"
-                        onClick={() => setLike(true)}
+                        onClick={handleLikeClick}
                       >
                         <IoMdHeartEmpty />
                       </button>
@@ -548,7 +603,7 @@ const BottomPlayer = () => {
             >
               <div className="w-[95%] flex justify-between items-center mt-3 mb-5">
                 <h1 className="text-white text-2xl font-syne">
-                  Your Playlists
+                  Add to Playlist
                 </h1>
                 <button
                   onClick={() => setCreatePlaylistScreen(!createPlaylistScreen)}
@@ -573,20 +628,23 @@ const BottomPlayer = () => {
                     <div className="flex items-center gap-3 py-5 w-[90%]">
                       <input
                         type="text"
+                        value={newPlaylistName}
+                        onChange={(e) => setNewPlaylistName(e.target.value)}
                         placeholder="Enter Playlist Name"
                         className="text-white text-lg font-syne bg-[#8d8d8d1e] border-[0.5px] outline-none py-4 pl-3 rounded-lg focus:outline-white  w-full"
                       />
                     </div>
                     <button
-                      onClick={() => setCreatePlaylistScreen(false)}
+                      onClick={() => createNewPlaylist(userContext.userDetails, newPlaylistName, track.currentTrack[track.currentIndex])}
                       className="text-black bg-[#27df6a] text-md  h-10 w-25 rounded-xl font-syne"
                     >
                       Done
                     </button>
                   </motion.div>
-                ) : (
-                  [...Array(10)].map((_, index) => (
+                ) : availablePlaylists.length > 0 ? (
+                  availablePlaylists.map((playlist, index) => (
                     <motion.div
+                      onClick={() => addToPlaylist(playlist.id, track.currentTrack[track.currentIndex])}
                       initial={{ opacity: 0 }}
                       animate={{ opacity: 1 }}
                       exit={{ opacity: 0 }}
@@ -603,11 +661,15 @@ const BottomPlayer = () => {
                           className="rounded-md"
                         />
                         <span className="text-white text-lg font-syne">
-                          Playlist Name {index + 1}
+                          {playlist.name}
                         </span>
                       </div>
                     </motion.div>
                   ))
+                ) : (
+                  <h1 className="text-white text-lg font-syne">
+                    No playlists available
+                  </h1>
                 )}
               </div>
             </div>

@@ -21,7 +21,7 @@ const TrackList = ({ width, data, index }) => {
   }, [data, track]);
 
   const handleTrackClick = () => {
-    if( genrectx.openGenre ){
+    if( genrectx.openGenre || playlstOpenCtx.openPlaylistScreen ){
       playfromplst.setPlayingFromPlaylist(true);
       const trackIndex = playfromplst.playlistSongs.findIndex(
         (track) => track.id === data.id

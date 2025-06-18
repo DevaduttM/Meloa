@@ -100,7 +100,7 @@ const SearchScreen = () => {
                         <>
                           {
                             [...Array(5)].map((_, index) => {
-                              return <TrackShimmer key={index} />;
+                              return <TrackShimmer key={index} page={"search"} />;
                             })
                           }
                         </>

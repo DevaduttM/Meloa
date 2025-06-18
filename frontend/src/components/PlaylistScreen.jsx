@@ -7,17 +7,48 @@ import { RiPlayListAddFill } from "react-icons/ri";
 import { IoArrowBack } from "react-icons/io5";
 import { AnimatePresence, motion } from "framer-motion";
 import { PiShuffleFill } from "react-icons/pi";
-import { PlaylistContext } from "@/context/PlayerContext";
+import { PlaylistContext, PlayFromPlaylistContext, currentTrackContext } from "@/context/PlayerContext";
 import { PlayerContext } from "@/context/PlayerContext";
 import BottomPlayer from "./BottomPlayer";
 import TrackList from "./TrackList";
+import { handleFetchAudio } from "@/utils/apicalls";
 
-const PlaylistScreen = () => {
+const PlaylistScreen = ({playlists, liked}) => {
   const [like, setLike] = useState(false);
   const [playlistScreen, setPlaylistScreen] = useState(false);
 
   const playlistctx = useContext(PlaylistContext);
   const playerctx = useContext(PlayerContext);
+  const plstctx = useContext(PlayFromPlaylistContext);
+  const track = useContext(currentTrackContext);
+  const player = useContext(PlayerContext);
+
+      const PlaylistPlay = () => {
+          console.log("Playing Playlist");
+          plstctx.setPlayingFromPlaylist(true);
+          plstctx.setPlaylistSongs(playlists.songs);
+          plstctx.setPlaylistIndex(0);
+          track.setCurrentTrack(prev => [...prev, playlists.songs[0]]);
+          track.setCurrentIndex((prev) => prev + 1);
+          player.setPlayerOpen(true);
+          handleFetchAudio(playlists.songs[0], track, player);
+          console.log("Playlist:", playlists.songs);
+      }
+  
+  
+      const shufflePlay = () => {
+  
+          console.log("Shuffling Playlist");
+          const shuffledPlaylist = [...plstctx.playlistSongs].sort(() => Math.random() - 0.5);
+          plstctx.setPlaylistSongs(shuffledPlaylist);
+          plstctx.setPlayingFromPlaylist(true);
+          plstctx.setPlaylistIndex(0);
+          track.setCurrentTrack(prev => [...prev, shuffledPlaylist[0]]);
+          track.setCurrentIndex((prev) => prev + 1);
+          player.setPlayerOpen(true);
+          handleFetchAudio(shuffledPlaylist[0], track, player);
+          console.log("Shuffled Playlist:", shuffledPlaylist);
+      }
 
   return (
     <>
@@ -42,17 +73,17 @@ const PlaylistScreen = () => {
               className="rounded-lg mb-10 mt-30 w-1/2 aspect-square shadow-[10px]"
             />
             <h1 className="text-white text-3xl font-syne mb-15">
-              Playlist Name
+              {liked ? "Liked Songs" : playlists.name}
             </h1>
 
             <div className="w-[80%] flex justify-around items-center">
-              <button className="text-[#27df6a] text-2xl shadow-2xl flex justify-center items-center py-3 bg-[#8d8d8d31] backdrop-blur-lg border-none outline-none p-3 rounded-lg w-45">
+              <button onClick={PlaylistPlay} className="text-[#27df6a] text-2xl shadow-2xl flex justify-center items-center py-3 bg-[#8d8d8d31] backdrop-blur-lg border-none outline-none p-3 rounded-lg w-45">
                 <FaPlay />
                 <span className="ml-4 text-xl text-[#ffffffe0] font-syne">
                   Play
                 </span>
               </button>
-              <button className="text-[#27df6a] text-2xl shadow-2xl flex justify-center items-center py-3 bg-[#8d8d8d31] backdrop-blur-lg border-none outline-none p-3 rounded-lg w-45">
+              <button onClick={shufflePlay} className="text-[#27df6a] text-2xl shadow-2xl flex justify-center items-center py-3 bg-[#8d8d8d31] backdrop-blur-lg border-none outline-none p-3 rounded-lg w-45">
                 <PiShuffleFill />
                 <span className="ml-4 text-xl text-[#ffffffe0] font-syne">
                   Shuffle
@@ -60,7 +91,26 @@ const PlaylistScreen = () => {
               </button>
             </div>
             <div className="w-full flex flex-col mt-10 justify-start items-center pb-35">
-              {[...Array(10)].map((_, index) => (
+              {liked ? (playlists.length > 0 ?
+              (playlists.map((song, index) => 
+              <div
+                  key={index}
+                  
+                  className="w-[90%] flex justify-start items-center p-2 rounded-lg "
+                >
+                  <div className="flex justify-center items-center">
+                    <h1 className="text-[#ffffffd7] text-2xl font-syne mr-5">{`${
+                      index + 1 < 10 ? `0${index + 1}` : index + 1
+                    }`}</h1>
+                  </div>
+                  <TrackList width={"w-full"} data={song} />
+                </div>
+            
+            )) : (
+                <div className="text-gray-500 text-lg font-syne mt-4 h-full justify-start flex-col items-center pt-6 px-5">
+                  <h1 className="text-gray-500 text-lg font-syne mt-4">No liked songs found</h1>
+                </div>
+            )) :(playlists.songs.map((song, index) => (
                 <div
                   key={index}
                   
@@ -71,9 +121,9 @@ const PlaylistScreen = () => {
                       index + 1 < 10 ? `0${index + 1}` : index + 1
                     }`}</h1>
                   </div>
-                  <TrackList width={"w-full"} data={{ title: `Track Title ${index + 1}`, artist: "Artist Name" }} />
+                  <TrackList width={"w-full"} data={song} />
                 </div>
-              ))}
+              )))}
             </div>
           </div>
         </motion.div>

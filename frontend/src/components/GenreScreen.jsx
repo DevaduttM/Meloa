@@ -7,6 +7,7 @@ import Image from "next/image";
 import TrackList from "./TrackList";
 import { GenreScreenContext, PlayFromPlaylistContext, currentTrackContext, PlayerContext } from "@/context/PlayerContext";
 import { handleFetchAudio } from "@/utils/apicalls";
+import TrackShimmer from './TrackShimmer';
 
 const GenreScreen = ({data}) => {
     const [genrePlaylist, setGenrePlaylist] = useState([]);
@@ -89,13 +90,13 @@ const GenreScreen = ({data}) => {
             </h1>
 
             <div className="w-[80%] flex justify-around items-center">
-              <button onClick={() => PlaylistPlay()} className="text-[#27df6a] text-2xl shadow-2xl flex justify-center items-center py-3 bg-[#8d8d8d31] backdrop-blur-lg border-none outline-none p-3 rounded-lg w-45">
+              <button disabled = {loading} onClick={() => PlaylistPlay()} className="text-[#27df6a] text-2xl shadow-2xl flex justify-center items-center py-3 bg-[#8d8d8d31] backdrop-blur-lg border-none outline-none p-3 rounded-lg w-45">
                 <FaPlay />
                 <span className="ml-4 text-xl text-[#ffffffe0] font-syne">
                   Play
                 </span>
               </button>
-              <button onClick={() => shufflePlay()} className="text-[#27df6a] text-2xl shadow-2xl flex justify-center items-center py-3 bg-[#8d8d8d31] backdrop-blur-lg border-none outline-none p-3 rounded-lg w-45">
+              <button disabled = {loading} onClick={() => shufflePlay()} className="text-[#27df6a] text-2xl shadow-2xl flex justify-center items-center py-3 bg-[#8d8d8d31] backdrop-blur-lg border-none outline-none p-3 rounded-lg w-45">
                 <PiShuffleFill />
                 <span className="ml-4 text-xl text-[#ffffffe0] font-syne">
                   Shuffle
@@ -103,6 +104,13 @@ const GenreScreen = ({data}) => {
               </button>
             </div>
             <div className="w-full flex flex-col mt-10 justify-start items-center pb-35">
+              {
+                loading ? <>
+                {[...Array(10)].map((_, index) => (
+                  <TrackShimmer key={index} page={"genre"} />
+                ))}
+                </> : <>
+
               {genrePlaylist.map((data, index) => (
                 <div
                   key={index}
@@ -117,6 +125,7 @@ const GenreScreen = ({data}) => {
                   <TrackList width={"w-full"} data={data} index={index} />
                 </div>
               ))}
+              </>}
             </div>
           </div>
         </motion.div>
