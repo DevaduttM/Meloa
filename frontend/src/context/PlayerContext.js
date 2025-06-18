@@ -5,3 +5,4 @@ export const PlaylistContext = createContext();
 export const currentTrackContext = createContext();
 export const GenreScreenContext = createContext();
 export const PlayFromPlaylistContext = createContext();
+export const UserDetailsContext = createContext();
