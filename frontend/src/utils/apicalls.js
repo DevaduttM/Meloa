@@ -1,3 +1,5 @@
+import axios from "axios";
+
 export const handleFetchAudio = async (data, track, player) => {
   try {
     // const response = await fetch(`http://192.168.1.7:5000/audio?id=${data.id}`);
@@ -38,3 +40,22 @@ export const handleFetchNext = async (data, track, play) => {
     console.error("Error fetching next video data:", error);
   }
 };
+
+export const uploadToCloudinary = async (file) => {
+  const formData = new FormData();
+  formData.append("file", file);
+  formData.append("upload_preset", "meloa_img");
+
+  try {
+    const response = await axios.post(
+      `https://api.cloudinary.com/v1_1/${process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME}/image/upload`,
+      formData
+    );
+    return response.data.secure_url;
+  } catch (error) {
+    console.error("Error uploading to Cloudinary:", error.response?.data || error.message);
+    throw error;
+  }
+};
+
+

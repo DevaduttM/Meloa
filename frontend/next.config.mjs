@@ -4,6 +4,7 @@ const nextConfig = {
         domains: [
             'i.ytimg.com',
             'lh3.googleusercontent.com',
+            'res.cloudinary.com',
         ],
     }
 };

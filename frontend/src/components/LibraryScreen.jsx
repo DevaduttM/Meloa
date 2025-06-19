@@ -7,6 +7,7 @@ import { PiSquaresFourLight } from "react-icons/pi";
 import PlaylistScreen from "./PlaylistScreen";
 import { GenreScreenContext, PlaylistContext, UserDetailsContext, PlayFromPlaylistContext } from "@/context/PlayerContext";
 import { fetchPlaylists } from "@/lib/firestore";
+import { db } from "@/lib/firebase";
 
 
 const LibraryScreen = () => {
@@ -15,9 +16,10 @@ const LibraryScreen = () => {
   const [availablePlaylists, setAvailablePlaylists] = useState([]);
   const [selectedPlaylist, setSelectedPlaylist] = useState(null);
   const [likedSongsPlaylist, setLikedSongsPlaylist] = useState(false);
+  const [playlistIndex, setPlaylistIndex] = useState(0);
 
     const playfromplstctx = useContext(PlayFromPlaylistContext);
-
+    const dbUserDetails = useContext(UserDetailsContext)
 
   const userContext = useContext(UserDetailsContext)
   useEffect(() => {
@@ -39,6 +41,8 @@ const LibraryScreen = () => {
     };
     loadPlaylists();
   }, [userContext.userDetails]);
+
+  console.log("Available Playlists:", dbUserDetails?.userDetails.playlists);
 
   return (
     <>
@@ -141,7 +145,7 @@ const LibraryScreen = () => {
                   { availablePlaylists.length > 0 ? (
                   availablePlaylists.map((playlist, index) => (
                     <div
-                      onClick={() => {setLikedSongsPlaylist(false); setSelectedPlaylist(playlist); setOpenPlaylistScreen(true); window.history.pushState(null, ""); playfromplstctx.setPlaylistSongs(playlist.songs)}}
+                      onClick={() => {setLikedSongsPlaylist(false); setSelectedPlaylist(playlist); setOpenPlaylistScreen(true); window.history.pushState(null, ""); playfromplstctx.setPlaylistSongs(playlist.songs); setPlaylistIndex(index)}}
                       className={`${
                         layout === "list"
                           ? "flex items-center gap-3 mb-5 justify-start w-full"
@@ -150,12 +154,12 @@ const LibraryScreen = () => {
                       key={index}
                     >
                       <Image
-                        src="/logo_img_only.png"
+                        src={dbUserDetails?.userDetails?.playlists.find((p) => p.id === playlist.id)?.coverUrl || "/logo_img_only.png"}
                         alt="Playlist Cover"
                         width={50}
                         height={50}
                         className={`bg-[#1f1f1f] rounded-lg ${
-                          layout === "list" ? "h-15 w-15 p-3" : "h-24 w-24 p-5"
+                          layout === "list" ? "h-15 w-15" : "h-24 w-24 p-5"
                         } `}
                       />
                       <div
@@ -188,7 +192,7 @@ const LibraryScreen = () => {
       </AnimatePresence>
       <AnimatePresence>
       {
-        openPlaylistScreen && <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className=""><PlaylistScreen playlists = {selectedPlaylist} liked={likedSongsPlaylist} /></motion.div>
+        openPlaylistScreen && <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className=""><PlaylistScreen playlists = {selectedPlaylist} liked={likedSongsPlaylist} index={playlistIndex}/></motion.div>
       }
       </AnimatePresence>
       </GenreScreenContext.Provider>

@@ -26,17 +26,21 @@ const TrackList = ({ width, data, index }) => {
       const trackIndex = playfromplst.playlistSongs.findIndex(
         (track) => track.id === data.id
       );
+      player.setPlaying(false);
       track.setCurrentTrack(prev => [...prev, playfromplst.playlistSongs[trackIndex]]);
       track.setCurrentIndex(prev => prev + 1 );
       playfromplst.setPlaylistIndex(trackIndex);
       player.setPlayerOpen(true);
+      player.setPlaying(true);
       handleFetchAudio(data, track, player);
     }
     else{
       playfromplst.setPlayingFromPlaylist(false);
+      player.setPlaying(false);
       track.setCurrentTrack(prev => [...prev, data]);
       track.setCurrentIndex(prev => prev + 1 );
       player.setPlayerOpen(true);
+      player.setPlaying(true);
       console.log("Setting current track to:", data);
       handleFetchAudio(data, track, player);
   

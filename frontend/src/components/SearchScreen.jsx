@@ -5,7 +5,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import { Search } from "lucide-react";
 import { RiSearch2Line } from "react-icons/ri";
 import TrackList from "./TrackList";
-import { currentTrackContext, GenreScreenContext, PlayerContext } from '@/context/PlayerContext';
+import { currentTrackContext, GenreScreenContext, PlayerContext, PlaylistContext } from '@/context/PlayerContext';
 import { RxCross2 } from "react-icons/rx";
 import TrackShimmer from "./TrackShimmer";
 
@@ -46,6 +46,7 @@ const SearchScreen = () => {
   return (
     <>
     <GenreScreenContext.Provider value={{ openGenre: false, setOpenGenre: () => {} }}>
+      <PlaylistContext.Provider value={{ openPlaylistScreen: false, setOpenPlaylistScreen: () => {} }}>
       <AnimatePresence>
         <div className="h-screen w-screen flex justify-start items-center bg-[#171717] flex-col relative overflow-x-hidden overflow-y-scroll scrollbar-hide">
           <div className="top-0 w-full flex justify-between px-3 pt-7 items-center">
@@ -137,6 +138,7 @@ const SearchScreen = () => {
           </motion.div>
         </div>
       </AnimatePresence>
+      </PlaylistContext.Provider>
     </GenreScreenContext.Provider>
     </>
   );

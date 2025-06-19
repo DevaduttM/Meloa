@@ -21,7 +21,7 @@ import { IoAdd } from "react-icons/io5";
 import { RiPlayListAddFill } from "react-icons/ri";
 import { PiPlaylist } from "react-icons/pi";
 import { handleFetchNext } from "@/utils/apicalls";
-import { fetchPlaylists, addSongToPlaylist, addLikedSong, removeLikedSong } from "@/lib/firestore";
+import { fetchPlaylists, addSongToPlaylist, addLikedSong, removeLikedSong, updateRecommendedSongs } from "@/lib/firestore";
 
 import Image from "next/image";
 import { Target } from "lucide-react";
@@ -72,7 +72,6 @@ const BottomPlayer = () => {
       if (audio.duration) {
         const currentProgress = (audio.currentTime / audio.duration) * 100;
         setProgress(currentProgress);
-        console.log("ref: ", hasFetchedRelated);
         if (currentProgress >= 90 && !hasFetchedRelated && !repeat) {
           hasFetchedRelated = true;
           fetchRelatedVideo(track?.currentTrack[track?.currentIndex]?.id);
@@ -83,6 +82,7 @@ const BottomPlayer = () => {
     const onEnded = () => {
       playState.setPlaying(false);
       setProgress(0);
+      setLike(false);
 
       if(!repeat) {
 
@@ -151,6 +151,7 @@ const BottomPlayer = () => {
           playState.setPlaying(true);
           ref.current.play();
           console.log("Related video set:", data.related[0]);
+          await updateRecommendedSongs(userContext.userDetails, data.related[1]);
         } else {
           console.error("No related video found in response");
         }
@@ -181,6 +182,7 @@ const BottomPlayer = () => {
 
     playState.setPlaying(false);
     setProgress(0);
+    setLike(false);
 
     const currentTrack = track.currentTrack[track.currentIndex];
     const id = currentTrack?.id;
@@ -232,6 +234,7 @@ const BottomPlayer = () => {
         track.setCurrentIndex((prevIndex) => prevIndex + 1);
 
         await handleFetchNext(nextTrack, track, playState);
+        await updateRecommendedSongs(userContext.userDetails, data.related[1]);
 
         console.log("Next Track Appended:", nextTrack);
       } catch (err) {
@@ -271,8 +274,6 @@ const BottomPlayer = () => {
     }
   };
 
-  console.log("Repeat:", repeat);
-
   const createNewPlaylist = async (user, PlaylistName, song) => {
     await createPlaylist(user, PlaylistName, song);
     setNewPlaylistName("");
@@ -296,16 +297,16 @@ const BottomPlayer = () => {
   const handleLikeClick = async() => {
     if (like) {
       setLike(false);
-      const updatedLikedSongs = userContext.likedSongs.filter(
+      const updatedLikedSongs = userContext.userDetails.likedSongs.filter(
         (likedSong) => likedSong.id !== track.currentTrack[track.currentIndex].id
       );
-      userContext.setLikedSongs(updatedLikedSongs);
+      userContext.userDetails.setLikedSongs(updatedLikedSongs);
       await removeLikedSong(userContext.userDetails, track.currentTrack[track.currentIndex]);
     }
     else {
       setLike(true);
       const newLikedSong = track.currentTrack[track.currentIndex];
-      userContext.setLikedSongs((prev) => [...prev, newLikedSong]);
+      userContext.userDetails.setLikedSongs((prev) => [...prev, newLikedSong]);
       await addLikedSong(userContext.userDetails, newLikedSong);
     }
   }
@@ -525,8 +526,8 @@ const BottomPlayer = () => {
                 </button>
               </div>
               <div className="open-bottom-icons fixed bottom-10 w-full flex justify-around items-center">
-                <AnimatePresence mode="wait">
-                  {like ? (
+                <AnimatePresence>
+                  {userContext.userDetails.likedSongs.some((song) => song.id === track.currentTrack[track.currentIndex].id) ? (
                     <motion.div
                       key="liked"
                       initial={{ opacity: 0.6 }}
@@ -556,7 +557,7 @@ const BottomPlayer = () => {
                         <IoMdHeartEmpty />
                       </button>
                     </motion.div>
-                  )}
+                  ) }
                 </AnimatePresence>
                 <a
                   href={`http://192.168.1.7:5000/download?id=${

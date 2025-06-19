@@ -1,4 +1,4 @@
-import { doc, getDoc, setDoc, collection, getDocs, addDoc } from "firebase/firestore";
+import { doc, getDoc, setDoc, collection, getDocs, addDoc, updateDoc } from "firebase/firestore";
 import { db } from "@/lib/firebase";
 
 export const setUserDetails = async (user) => {
@@ -12,6 +12,8 @@ export const setUserDetails = async (user) => {
           email: user.email,
           photoURL: user.photoURL || '',
           likedSongs: [],
+          recommendedSongs: [],
+          recommendedSongsIndex: 0,
         }, { merge: true });    
     }
   } catch (error) {
@@ -23,8 +25,15 @@ export const getUserDetails = async (user) => {
   try {
     const userRef = doc(db, 'Users', user.uid);
     const docSnap = await getDoc(userRef);
+
+    const playlstRef = collection(db, 'Users', user.uid, 'Playlists');
+    const playlstSnap = await getDocs(playlstRef);
+    const playlists = playlstSnap.docs.map(doc => ({
+      id: doc.id,
+      ...doc.data(),
+    }));
     if (docSnap.exists()) {
-      return docSnap.data();
+      return { ...docSnap.data(), playlists };
     } else {
       console.log("No such document!");
       return null;
@@ -41,6 +50,7 @@ export const createPlaylist = async (user, playlistName, song) => {
 
     const docRef = await addDoc(playlistsRef, {
       name: playlistName,
+      coverUrl: '/logo_img_only.png',
       songs: [song],
     });
     console.log("Playlist created with ID:", docRef.id);
@@ -114,5 +124,96 @@ export const removeLikedSong = async (user, song) => {
     }
   } catch (error) {
     console.error("Error removing liked song:", error);
+  }
+}
+
+export const updateRecommendedSongs = async (user, song) => {
+  const userRef = doc(db, 'Users', user.uid);
+
+  try {
+    const docSnap = await getDoc(userRef);
+
+    if (!docSnap.exists()) {
+      console.error("User does not exist");
+      return;
+    }
+
+    const userData = docSnap.data();
+    const currentIndex = userData.recommendedSongsIndex;
+    const recommendedSongs = userData.recommendedSongs || [];
+
+    recommendedSongs[currentIndex] = song;
+    const updatedIndex = (currentIndex + 1) % 10;
+
+    await updateDoc(userRef, {
+      recommendedSongs: recommendedSongs,
+      recommendedSongsIndex: updatedIndex,
+    });
+
+    console.log("Recommended songs updated successfully");
+  } catch (error) {
+    console.error("Error updating recommended songs:", error);
+  }
+};
+
+
+export const setRecommendedSongs = async (user, songs) => {
+  const userRef = doc(db, 'Users', user.uid);
+  try {
+    await setDoc(userRef, {
+      recommendedSongs: songs,
+      recommendedSongsIndex: 0,
+    }, { merge: true });
+    console.log("Recommended songs set successfully");
+  } catch (error) {
+    console.error("Error setting recommended songs:", error);
+  }
+}
+
+export const editName = async (user, newName) => {
+  const userRef = doc(db, 'Users', user.uid);
+  try {
+    await updateDoc(userRef, {
+      name: newName,
+    });
+    console.log("User name updated successfully");
+  } catch (error) {
+    console.error("Error updating user name:", error);
+  }
+}
+
+export const editPhotoURL = async (user, newPhotoURL) => {
+  const userRef = doc(db, 'Users', user.uid);
+  try {
+    await updateDoc(userRef, {
+      photoURL: newPhotoURL,
+    });
+    console.log("User photo URL updated successfully");
+  } catch (error) {
+    console.error("Error updating user photo URL:", error);
+  }
+}
+
+export const updatePlaylistName = async (user, playlistId, newName) => {
+  const playlistRef = doc(db, 'Users', user.uid, 'Playlists', playlistId);
+  try {
+    await updateDoc(playlistRef, {
+      name: newName,
+    });
+    console.log("Playlist name updated successfully");
+  } catch (error) {
+    console.error("Error updating playlist name:", error);
+  }
+}
+
+export const updatePlaylistCover = async (user, playlistId, newCoverUrl) => {
+  const playlistRef = doc(db, 'Users', user.uid, 'Playlists', playlistId);
+  try {
+    await updateDoc(playlistRef, {
+      coverUrl: newCoverUrl,
+    });
+    console.log("Playlist cover updated successfully");
+  } catch (error) {
+    console.error("Error updating playlist cover:", error);
   }
 }

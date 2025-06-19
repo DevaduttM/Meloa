@@ -3,7 +3,7 @@ import Image from "next/image";
 import { AnimatePresence, motion } from "framer-motion";
 import { FaRegCircleUser } from "react-icons/fa6";
 import { IoMdMore } from "react-icons/io";
-import { PlayerContext, GenreScreenContext, currentTrackContext, PlaylistContext } from "@/context/PlayerContext";
+import { PlayerContext, GenreScreenContext, currentTrackContext, PlaylistContext, AccountScreenOpenContext, UserDetailsContext } from "@/context/PlayerContext";
 import TrackList from "./TrackList";
 import { handleFetchAudio } from "@/utils/apicalls";
 import PlaylistScreen from "./PlaylistScreen";
@@ -11,16 +11,19 @@ import GenreScreen from "./GenreScreen";
 import { auth } from "@/lib/firebase";
 import { useRouter } from "next/navigation";
 import withAuth from "@/lib/withAuth";
+import AccountScreen from "./AccountScreen";
 
-const HomeScreen = ({trendingSongs}) => {
+const HomeScreen = ({trendingSongs, recommendedSongs}) => {
   const [shuffledGenres, setShuffledGenres] = useState([]);
   const [chunks, setChunks] = useState([]);
   const [openGenre, setOpenGenre] = useState(false);
   const [genreScreenDetails, setGenreScreenDetails] = useState(null);
   const [userDetails, setUserDetails] = useState(null);
+  const [accountScreenOpen, setAccountScreenOpen] = useState(false);
 
   const player = useContext(PlayerContext);
   const track = useContext(currentTrackContext);
+  const dbUserDetails = useContext(UserDetailsContext)
 
   const router = useRouter();
 
@@ -91,18 +94,7 @@ const HomeScreen = ({trendingSongs}) => {
     };
   }, [openGenre]);
 
-    const handleSignOut = async () => {
-    try {
-      await auth.signOut();
-      console.log("User signed out successfully");
-      window.localStorage.removeItem("user");
-      router.push('/signin');
-    }
-    catch (error) {
-      console.error("Error signing out:", error);
-      alert("Failed to sign out. Please try again.");
-    }
-  };
+    
 
   // useEffect(() => {
   //   const shuffledGenre = getShuffledArray(genreDetails);
@@ -115,12 +107,26 @@ const HomeScreen = ({trendingSongs}) => {
 
   // console.log("Trending Songs:", trendingSongs);
 
+  useEffect(() => {
+    const onPopState = (event) => {
+      if (accountScreenOpen) {
+        setAccountScreenOpen(false);
+      }
+    };
+    window.addEventListener("popstate", onPopState);
+    return () => {
+      window.removeEventListener("popstate", onPopState);
+    };
+  }, [accountScreenOpen]);
+
+  console.log("User Details:", dbUserDetails.userDetails.photoURL);
 
 
   return (
     <>
     <GenreScreenContext.Provider value={{ openGenre, setOpenGenre }}>
       <PlaylistContext.Provider value={{ openPlaylistScreen: false, setOpenPlaylistScreen: () => {} }}>
+        <AccountScreenOpenContext.Provider value={{ accountScreenOpen, setAccountScreenOpen }}>
       <AnimatePresence>
         <div className="h-screen w-screen flex justify-start items-center bg-[#171717] flex-col relative overflow-x-hidden overflow-y-scroll scrollbar-hide">
           <div className="top-0 w-full flex justify-between px-3 pt-7 items-center">
@@ -135,12 +141,12 @@ const HomeScreen = ({trendingSongs}) => {
                 Meloa
               </h1>
             </div>
-            <div onClick={handleSignOut} className="w-fit h-full flex justify-center items-center gap-2">
+            <div onClick={() => {setAccountScreenOpen(true); window.history.pushState({}, null);}} className="w-fit h-full flex justify-center items-center gap-2">
               {
-                userDetails?.photoURL ? (
+                dbUserDetails?.userDetails.photoURL ? (
                   <div className="flex items-center gap-2">
                     <Image
-                      src={userDetails.photoURL}
+                      src={dbUserDetails.userDetails.photoURL}
                       alt="User Avatar"
                       width={35}
                       height={35}
@@ -214,34 +220,21 @@ const HomeScreen = ({trendingSongs}) => {
               Recommended For You
             </h1>
             <div className={`w-full pl-6 py-8 flex flex-row justify-start items-center overflow-x-scroll scrollbar-hide ${player.playerOpen ? "pb-40" : "pb-30"}`}>
-              {[...Array(2)].map((_, outerIndex) => (
+              {recommendedSongs.map((chunk, outerIndex) => (
                 <div
                   key={outerIndex}
-                  className="min-w-[65vw] flex-col gap-5 h-full flex justify-between items-center mr-4"
+                  className="home-trending min-w-[65vw] flex-col gap-5 h-full flex justify-between items-center mr-4"
                 >
-                  {[...Array(3)].map((_, index) => (
+                  {chunk.map((item, index) => (
                     <div
                       key={index}
-                      className="w-full h-full flex justify-between items-center mb-3"
+                      className="w-full h-full flex justify-between items-start mb-3"
                     >
-                      <div className="flex justify-center items-center gap-3 w-full">
-                        <Image
-                          src="/logo_img_only.png"
-                          alt="Track Cover"
-                          width={30}
-                          height={30}
-                          className="bg-[#1f1f1f] rounded-lg h-15 w-15 p-3"
-                        />
-                        <div className="h-full w-full flex flex-col items-start justify-center">
-                          <h1 className=" track-title text-white text-md font-syne">
-                            Track Title
-                          </h1>
-                          <h2 className="text-gray-400 text-sm font-syne">
-                            Artist Name
-                          </h2>
-                        </div>
-                      </div>
-                      <IoMdMore className="text-2xl text-gray-200" />
+                      <TrackList
+                        data={item}
+                        width="w-full"
+                        index={index}
+                      />
                     </div>
                   ))}
                 </div>
@@ -257,6 +250,16 @@ const HomeScreen = ({trendingSongs}) => {
                     ) : null
                   }
       </AnimatePresence>
+
+      <AnimatePresence>
+      {
+                    accountScreenOpen ? (
+                      <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className=""><AccountScreen /></motion.div>
+                    ) : null
+                  }
+      </AnimatePresence>
+
+      </AccountScreenOpenContext.Provider>
       </PlaylistContext.Provider>
       </GenreScreenContext.Provider >
     </>

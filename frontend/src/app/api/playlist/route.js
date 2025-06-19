@@ -22,7 +22,7 @@ export async function GET(request) {
         const playlistResults = await youtubeInstance.getPlaylist(id);
         console.log("Playlist Results:", playlistResults.videos);
 
-        const results = playlistResults.videos.slice(0, 5).map((video) => ({
+        const results = playlistResults.videos.slice(0, 10).map((video) => ({
             title: video.title?.text ?? "No Title",
             id: video.id ?? "Unknown ID",
             channel: video.author?.name ?? "Unknown",

@@ -13,7 +13,7 @@ import { PlayerContext, currentTrackContext, PlayFromPlaylistContext, UserDetail
 import Image from "next/image";
 import { FaRegCircleUser } from "react-icons/fa6";
 import withAuth from "@/lib/withAuth";
-import { getUserDetails } from "@/lib/firestore";
+import { getUserDetails, setRecommendedSongs } from "@/lib/firestore";
 
 const Navbar = () => {
   const [page, setPage] = useState("home");
@@ -30,6 +30,7 @@ const Navbar = () => {
   const [playlistIndex, setPlaylistIndex] = useState(0);
   const [userDetails, setUserDetails] = useState(null);
   const [likedSongs, setLikedSongs] = useState([]);
+  const [chunks2, setChunks2] = useState([]);
 
   useEffect(() => {
     const handleTrendingSearch = async () => {
@@ -76,18 +77,40 @@ const Navbar = () => {
 
     useEffect(() => {
 const chunkArray = (arr, size) => {
-    const shuffledTrending = getShuffledArray(trendingSongs);
     const trending_grouped = [];
-    for (let i = 0; i < shuffledTrending.length; i += size) {
-      console.log(shuffledTrending.slice(i, i + size));
-      trending_grouped.push(shuffledTrending.slice(i, i + size));
+    for (let i = 0; i < arr.length; i += size) {
+      console.log(arr.slice(i, i + size));
+      trending_grouped.push(arr.slice(i, i + size));
     }
     // console.log("Chunked Trending Songs:", trending_grouped);
     return trending_grouped;
   };
-  const chunks = chunkArray(trendingSongs, 3);
+  console.log("Trending Songs Slice:", trendingSongs.slice(0, 10));
+  const shuffledTrendingSongs = getShuffledArray(trendingSongs);
+  const slicedTrending1 = shuffledTrendingSongs.slice(0, 10);
+  const slicedTrending2 = shuffledTrendingSongs.slice(10, 20);
+  const chunks = chunkArray(slicedTrending1, 3);
   setChunks(chunks);
+  if (userDetails?.recommendedSongs?.length > 0) {
+    const chunks2 = chunkArray(userDetails?.recommendedSongs, 3);
+    setChunks2(chunks2);
+  }
+  else {
+   const chunks2 = chunkArray(slicedTrending2, 3);
+    setChunks2(chunks2);
+    addRecommendedSongs(slicedTrending2);
+  }
 }, [trendingSongs]);
+
+const addRecommendedSongs = async (songs) => {
+  if (!userDetails) return;
+
+  try {
+    await setRecommendedSongs(userDetails, songs);
+  } catch (error) {
+    console.error("Error adding recommended songs:", error);
+  }
+};
 
   return (
     <>
@@ -101,7 +124,7 @@ const chunkArray = (arr, size) => {
           {page === "home" && loading ? (
             <HomeScreenShimmer />
           ) : page === "home" ? (
-            <HomeScreen trendingSongs={chunks} />
+            <HomeScreen trendingSongs={chunks} recommendedSongs={chunks2} />
           ) : page === "search" ? (
             <SearchScreen />
           ) : page === "library" ? (
