@@ -1,10 +1,14 @@
 import axios from "axios";
 
 export const handleFetchAudio = async (data, track, player) => {
+  if (!data || !data.id) {
+    console.error("Invalid data or missing ID:", data);
+    return;
+  }
   try {
-    // const response = await fetch(`http://192.168.1.7:5000/audio?id=${data.id}`);
-    const response = await fetch(`/api/audio?id=${data.id}`);
-    const audioData = await response.json();
+    const response = await fetch(`http://100.108.234.43:5000/audio?id=${data.id}`);
+    // const response = await fetch(`/api/audio?id=${data.id}`);
+    const audioData = await response.text();
     console.log("Audio data fetched:", audioData);
     if (audioData && audioData.audioUrl) {
       player.setPlayerOpen(true);
@@ -26,7 +30,7 @@ export const handleFetchAudio = async (data, track, player) => {
 
 export const handleFetchNext = async (data, track, play) => {
   try {
-    const response = await fetch(`http://192.168.1.7:5000/audio?id=${data.id}`);
+    const response = await fetch(`http://100.108.234.43:5000/audio?id=${data.id}`);
     const audioData = await response.json();
     console.log("Audio data fetched:", audioData);
     if (audioData && audioData.audioUrl) {
