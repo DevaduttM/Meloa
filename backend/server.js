@@ -5,7 +5,10 @@ const ytdl = require('@distube/ytdl-core');
 
 const PORT = process.env.PORT || 5000;
 
-app.use(cors());
+app.use(cors({
+  origin: '*',
+  methods: ['GET', 'POST'], 
+}));
 app.use(express.json());
 
 app.get('/audio', async (req, res) => {
