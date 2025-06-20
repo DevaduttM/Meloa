@@ -19,6 +19,7 @@ import TrackList from "./TrackList";
 import { handleFetchAudio, uploadToCloudinary } from "@/utils/apicalls";
 import { FiEdit3 } from "react-icons/fi";
 import { updatePlaylistCover, updatePlaylistName } from "@/lib/firestore";
+import MessageBox from "./MessageBox";
 
 const PlaylistScreen = ({ playlists, liked, index }) => {
   const dbUserDetails = useContext(UserDetailsContext);
@@ -39,6 +40,8 @@ const PlaylistScreen = ({ playlists, liked, index }) => {
   const [playlistCoverURL, setPlaylistCoverURL] = useState(
     dbUserDetails.userDetails.playlists[index].coverUrl || "/logo_img_only.png"
   );
+  const [showMessageBox, setShowMessageBox] = useState(false);
+  const [messageBoxMessage, setMessageBoxMessage] = useState("");
 
   const playlistctx = useContext(PlaylistContext);
   const playerctx = useContext(PlayerContext);
@@ -86,11 +89,12 @@ const PlaylistScreen = ({ playlists, liked, index }) => {
           }
           try {
               await updatePlaylistName(dbUserDetails.userDetails, playlists.id, editedPlaylistName);
-              window.localStorage.setItem("user", JSON.stringify({
-                  ...dbUserDetails.userDetails,
-                  displayName: editedPlaylistName
-              }));
               dbUserDetails.userDetails.playlists[index].name = editedPlaylistName;
+              setShowMessageBox(true);
+              setMessageBoxMessage("Playlist name updated successfully");
+              setTimeout(() => {
+                  setShowMessageBox(false);
+              }, 2000);
           } catch (error) {
               console.error("Error updating playlist name:", error);
           }
@@ -110,6 +114,11 @@ const PlaylistScreen = ({ playlists, liked, index }) => {
               await updatePlaylistCover(dbUserDetails.userDetails, playlists.id, url);
               if (url) {
                 dbUserDetails.userDetails.playlists[index].coverUrl = url;
+                setMessageBoxMessage("Playlist cover updated successfully");
+                setShowMessageBox(true);
+                setTimeout(() => {
+                  setShowMessageBox(false);
+                }, 2000);
               } else {
                 console.error("Failed to upload image to Cloudinary");
               }
@@ -284,6 +293,11 @@ const PlaylistScreen = ({ playlists, liked, index }) => {
             </div>
           </div>
         </motion.div>
+              {showMessageBox && (
+                <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.5 }} className="">
+                  <MessageBox message={messageBoxMessage} type="success" />
+                </motion.div>
+              )}
       </div>
     </>
   );

@@ -10,6 +10,7 @@ import { auth } from "@/lib/firebase";
 import { editName, editPhotoURL } from "@/lib/firestore";
 import { uploadToCloudinary } from "@/utils/apicalls";
 import { useRouter } from "next/navigation";
+import MessageBox from "./MessageBox";
 
 const AccountScreen = () => {
   const userDetails = JSON.parse(window.localStorage.getItem("user"));
@@ -24,11 +25,15 @@ const AccountScreen = () => {
   const [profilePhotoURL, setProfilePhotoURL] = useState(
     dbuserDetails.userDetails.photoURL || "/logo_img_only.png"
     );
+  const [openMessageBox, setOpenMessageBox] = useState(false);
+  const [message, setMessage] = useState("");
 
   const inputRef = useRef(null);
   const fileRef = useRef(null);
 
     const router = useRouter();
+    console.log("User Details from localStorage:", userDetails);
+    console.log("User Details from context:", dbuserDetails);
 
   const handleSignOut = async () => {
     try {
@@ -63,6 +68,7 @@ useEffect(() => {
 
   
   const updateUserName = async () => {
+      console.log("Updating user name...");
       setEdit(false);
       if (editedName.trim() === "") {
           setEditedName(dbuserDetails.userDetails.name || "No Name");
@@ -71,10 +77,12 @@ useEffect(() => {
         }
         try {
             await editName(userDetails, editedName);
-            window.localStorage.setItem("user", JSON.stringify({
-                ...userDetails,
-                displayName: editedName
-            }));
+            setEdit(false);
+            setOpenMessageBox(true);
+            setMessage("Name updated successfully!");
+            setTimeout(() => {
+                setOpenMessageBox(false);
+            }, 2000);
         } catch (error) {
             console.error("Error updating user name:", error);
         }
@@ -96,6 +104,11 @@ useEffect(() => {
         await editPhotoURL(userDetails, url);
         if (url) {
           dbuserDetails.userDetails.photoURL = url;
+          setOpenMessageBox(true);
+          setMessage("Profile picture updated successfully!");
+          setTimeout(() => {
+            setOpenMessageBox(false);
+          }, 2000);
         } else {
           console.error("Failed to upload image to Cloudinary");
         }
@@ -120,12 +133,12 @@ useEffect(() => {
           </h1>
         </div>
       </div>
-      <div onClick={(e) => {e.stopPropagation(); setUploadScreen(true);}} className="h-[50%] w-screen flex justify-between items-center flex-col">
-        <div className="relative">
+      <div className="h-[50%] w-screen flex justify-between items-center flex-col">
+        <div className="relative" onClick={(e) => {e.stopPropagation(); setUploadScreen(true);}}>
             <AnimatePresence>
             {
                 uploadScreen && (
-                    <motion.div onClick={() => fileRef.current.click()} initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.2 }} className="absolute top-0 left-0 w-full h-full bg-[#000000be] rounded-full flex justify-center items-center">
+                    <motion.div onClick={() => fileRef.current.click()} initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.2 }} className="absolute top-0 left-0 w-full aspect-square bg-[#000000be] rounded-full flex justify-center items-center">
                         <p className="text-white font-syne">Change Picture</p>
                         <input type="file" ref={fileRef} onChange={handleProfilePicUpdate} className="hidden" />
                     </motion.div>
@@ -155,6 +168,7 @@ useEffect(() => {
                 value={editedName}
                 readOnly={!edit}
                 onChange={(e) => setEditedName(e.target.value)}
+                onClick={(e) => e.stopPropagation()}
                 className="w-full h-[3.5rem] bg-[#171717] text-white rounded-xl px-4 outline-none border border-[#a5a5a549] focus:border-white text-sm font-syne"
               />
               <AnimatePresence>
@@ -167,8 +181,8 @@ useEffect(() => {
                     transition={{ duration: 0.2 }}
                   >
                     <button
-                        onClick={() => updateUserName}
-                      className={` w-20 h-[75%] absolute right-2 top-1/2 -translate-y-1/2 justify-center items-center bg-[#27df6a] text-black font-syne rounded-lg`}
+                        onClick={() => updateUserName()}
+                      className={`z-10 w-20 h-[75%] absolute right-2 top-1/2 -translate-y-1/2 justify-center items-center bg-[#27df6a] text-black font-syne rounded-lg`}
                     >
                       Save
                     </button>
@@ -229,6 +243,15 @@ useEffect(() => {
           <button onClick={handleSignOut} className="w-32 h-10 bg-red-500 text-white rounded-lg mt-5">Sign Out</button>
         </div>
       </div>
+      <AnimatePresence>
+      {
+        openMessageBox && (
+          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.5 }} className="">
+            <MessageBox message={message} />
+          </motion.div>
+        )
+      }
+      </AnimatePresence>
     </div>
   );
 };
