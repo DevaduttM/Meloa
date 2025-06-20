@@ -24,11 +24,6 @@ import MessageBox from "./MessageBox";
 const PlaylistScreen = ({ playlists, liked, index }) => {
   const dbUserDetails = useContext(UserDetailsContext);
 
-  console.log(
-    "user Details playlist:",
-    dbUserDetails.userDetails.playlists[0].id == playlists.id
-  );
-
   const [like, setLike] = useState(false);
   const [playlistScreen, setPlaylistScreen] = useState(false);
   const [uploadScreen, setUploadScreen] = useState(false);
@@ -38,7 +33,7 @@ const PlaylistScreen = ({ playlists, liked, index }) => {
   );
   const [edit, setEdit] = useState(false);
   const [playlistCoverURL, setPlaylistCoverURL] = useState(
-    dbUserDetails.userDetails.playlists[index].coverUrl || "/logo_img_only.png"
+    dbUserDetails.userDetails.playlists[index]?.coverUrl || "/logo_img_only.png"
   );
   const [showMessageBox, setShowMessageBox] = useState(false);
   const [messageBoxMessage, setMessageBoxMessage] = useState("");

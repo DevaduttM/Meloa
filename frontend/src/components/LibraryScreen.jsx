@@ -66,9 +66,6 @@ const LibraryScreen = () => {
                 Meloa
               </h1>
             </div>
-            <div className="w-fit h-full flex justify-center items-center gap-2">
-              <FaRegCircleUser className="text-3xl text-[#27df6a] mr-2" />
-            </div>
           </div>
           <motion.div
             initial={{ opacity: 0 }}
