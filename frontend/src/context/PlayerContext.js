@@ -7,3 +7,4 @@ export const GenreScreenContext = createContext();
 export const PlayFromPlaylistContext = createContext();
 export const UserDetailsContext = createContext();
 export const AccountScreenOpenContext = createContext();
+export const MessageBoxContext = createContext();

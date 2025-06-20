@@ -1,23 +1,27 @@
 import axios from "axios";
 
 export const handleFetchAudio = async (data, track, player) => {
+  track.setLoadingAudio(true);
   if (!data || !data.id) {
     console.error("Invalid data or missing ID:", data);
+    track.setLoadingAudio(false);
     return;
   }
   try {
-    const response = await fetch(`http://100.108.234.43:5000/audio?id=${data.id}`);
+    const response = await axios.get(`http://192.168.1.7:5000/audio?id=${data.id}`);
     // const response = await fetch(`/api/audio?id=${data.id}`);
-    const audioData = await response.text();
+    const audioData = await response.data;
     console.log("Audio data fetched:", audioData);
     if (audioData && audioData.audioUrl) {
       player.setPlayerOpen(true);
       track.setAudioUrl((prev) => {
         const updated = [...prev, audioData.audioUrl];
         track.setCurrentIndex(updated.length - 1);
+
         return updated;
       });
 
+      track.setLoadingAudio(false);
       player.setPlaying(true);
       console.log("Audio URL set:", audioData.audioUrl);
     } else {
@@ -29,13 +33,15 @@ export const handleFetchAudio = async (data, track, player) => {
 };
 
 export const handleFetchNext = async (data, track, play) => {
+  track.setLoadingAudio(true);
   try {
-    const response = await fetch(`http://100.108.234.43:5000/audio?id=${data.id}`);
+    const response = await fetch(`http://192.168.1.7:5000/audio?id=${data.id}`);
     const audioData = await response.json();
     console.log("Audio data fetched:", audioData);
     if (audioData && audioData.audioUrl) {
       track.setAudioUrl((prev) => [...prev, audioData.audioUrl]);
       console.log("Next video URL set:", audioData.audioUrl);
+      track.setLoadingAudio(false);
         // play.setPlaying(true);
     } else {
       console.error("No next video URL found in response");

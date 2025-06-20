@@ -14,6 +14,7 @@ import Image from "next/image";
 import { FaRegCircleUser } from "react-icons/fa6";
 import withAuth from "@/lib/withAuth";
 import { getUserDetails, setRecommendedSongs } from "@/lib/firestore";
+import { useRouter } from "next/navigation";
 
 const Navbar = () => {
   const [page, setPage] = useState("home");
@@ -31,6 +32,17 @@ const Navbar = () => {
   const [userDetails, setUserDetails] = useState(null);
   const [likedSongs, setLikedSongs] = useState([]);
   const [chunks2, setChunks2] = useState([]);
+  const [loadingAudio, setLoadingAudio] = useState(false);
+
+  const router = useRouter();
+
+  useEffect(() => {
+    const user = window.localStorage.getItem("user");
+    if (!user) {
+      router.replace("/signin");
+      return;
+    }
+  }, []);
 
   useEffect(() => {
     const handleTrendingSearch = async () => {
@@ -58,13 +70,17 @@ const Navbar = () => {
   useEffect(() => {
     const fetchUserDetails = async () => {
       const userDetails = JSON.parse(localStorage.getItem("user"));
-      const fetchedUserDetails = await getUserDetails(userDetails);
-      if (fetchedUserDetails) {
-        setUserDetails(fetchedUserDetails);
-        setLikedSongs(fetchedUserDetails.likedSongs || []);
-        console.log("User details from localStorage:", fetchedUserDetails);
+      if (!userDetails) {
+        console.log("No user details found in localStorage");
       } else {
-        setUserDetails(null);
+        const fetchedUserDetails = await getUserDetails(userDetails);
+        if (fetchedUserDetails) {
+          setUserDetails(fetchedUserDetails);
+          setLikedSongs(fetchedUserDetails.likedSongs || []);
+          console.log("User details from localStorage:", fetchedUserDetails);
+        } else {
+          setUserDetails(null);
+        }
       }
     };
 
@@ -117,7 +133,7 @@ const addRecommendedSongs = async (songs) => {
       <PlayerContext.Provider
         value={{ playing, setPlaying, playerOpen, setPlayerOpen }}
       >
-        <currentTrackContext.Provider value={{currentTrack, setCurrentTrack, audioUrl, setAudioUrl, currentIndex, setCurrentIndex}}>
+        <currentTrackContext.Provider value={{currentTrack, setCurrentTrack, audioUrl, setAudioUrl, currentIndex, setCurrentIndex, loadingAudio, setLoadingAudio}}>
         <PlayFromPlaylistContext.Provider value={{playingFromPlaylist, setPlayingFromPlaylist, playlistSongs, setPlaylistSongs, playlistIndex, setPlaylistIndex}}>
           <UserDetailsContext.Provider value={{userDetails, setUserDetails, likedSongs, setLikedSongs}}>
         <div className="h-screen w-screen flex justify-center flex-col items-center bg-[#171717]">
@@ -251,4 +267,4 @@ const addRecommendedSongs = async (songs) => {
   );
 };
 
-export default withAuth(Navbar);
+export default Navbar;

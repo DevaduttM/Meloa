@@ -22,10 +22,13 @@ import { RiPlayListAddFill } from "react-icons/ri";
 import { PiPlaylist } from "react-icons/pi";
 import { handleFetchNext } from "@/utils/apicalls";
 import { fetchPlaylists, addSongToPlaylist, addLikedSong, removeLikedSong, updateRecommendedSongs } from "@/lib/firestore";
+import Lottie from "lottie-react";
+import animationFile from "@/assets/loading_animation.json";
 
 import Image from "next/image";
 import { Target } from "lucide-react";
 import { createPlaylist } from "@/lib/firestore";
+import MessageBox from "./MessageBox";
 
 const BottomPlayer = () => {
   const ref = useRef(null);
@@ -44,6 +47,7 @@ const BottomPlayer = () => {
   const [nextTrack, setNextTrack] = useState(null);
   const [newPlaylistName, setNewPlaylistName] = useState("");
   const [availablePlaylists, setAvailablePlaylists] = useState([]);
+  const [showMessageBox, setShowMessageBox] = useState(false);
 
   const router = useRouter();
 
@@ -181,7 +185,6 @@ const BottomPlayer = () => {
     }
 
     playState.setPlaying(false);
-    setProgress(0);
     setLike(false);
 
     const currentTrack = track.currentTrack[track.currentIndex];
@@ -193,7 +196,7 @@ const BottomPlayer = () => {
     }
 
     if (
-      track.currentIndex < track.currentTrack.length - 1 &&
+      track.currentIndex < track.currentTrack.length - 1 || progress >= 90 &&
       !fromplaylstctx.playingFromPlaylist
     ) {
       const nextIndex = track.currentIndex + 1;
@@ -219,6 +222,7 @@ const BottomPlayer = () => {
       playState.setPlaying(true);
       return;
     } else {
+          setProgress(0);
       try {
         const response = await fetch(`/api/nextvideo?id=${id}`);
         const data = await response.json();
@@ -279,6 +283,10 @@ const BottomPlayer = () => {
     setNewPlaylistName("");
     setCreatePlaylistScreen(false);
     setPlaylistScreen(false);
+    setShowMessageBox(true);
+    setTimeout(() => {
+      setShowMessageBox(false);
+    }, 2000);
   }
 
   const showPlaylists = async (user) => {
@@ -292,24 +300,36 @@ const BottomPlayer = () => {
   const addToPlaylist = async (playlistId, song) => {
     await addSongToPlaylist(userContext.userDetails, playlistId, song);
     setPlaylistScreen(false);
+    setShowMessageBox(true);
+    setTimeout(() => {
+      setShowMessageBox(false);
+    }, 2000);
   }
 
   const handleLikeClick = async() => {
     if (like) {
       setLike(false);
-      const updatedLikedSongs = userContext.userDetails.likedSongs.filter(
+      const updatedLikedSongs = userContext.likedSongs.filter(
         (likedSong) => likedSong.id !== track.currentTrack[track.currentIndex].id
       );
-      userContext.userDetails.setLikedSongs(updatedLikedSongs);
+      userContext.setLikedSongs(updatedLikedSongs);
       await removeLikedSong(userContext.userDetails, track.currentTrack[track.currentIndex]);
     }
     else {
       setLike(true);
       const newLikedSong = track.currentTrack[track.currentIndex];
-      userContext.userDetails.setLikedSongs((prev) => [...prev, newLikedSong]);
+      userContext.setLikedSongs((prev) => [...prev, newLikedSong]);
       await addLikedSong(userContext.userDetails, newLikedSong);
     }
   }
+
+  useEffect(() => {
+    if(track.loadingAudio && progress < 90) {
+      ref.current.pause();
+      ref.current.currentTime = 0;
+      setProgress(0);
+    }
+  }, [track.loadingAudio]);
 
   return (
     <>
@@ -367,19 +387,22 @@ const BottomPlayer = () => {
           onClick={(e) => e.stopPropagation()}
           className="flex items-center gap-6"
         >
-          <button onClick={handleRewindClick} className="text-white text-2xl">
+          <button disabled={track.loadingAudio} onClick={handleRewindClick} className="text-white text-2xl">
             <PiRewindFill />
           </button>
-          {playState.playing ? (
-            <button
-              className="text-white text-2xl"
-              onClick={() => {
-                playState.setPlaying(false);
-                ref.current.pause();
-              }}
-            >
-              <FaPause />
-            </button>
+          {track.loadingAudio && progress < 90 ? (
+            <Lottie animationData={animationFile} loop={true} className="h-6 w-6 p-0 scale-400 m-0" />
+          ) : (
+            playState.playing ? (
+              <button
+                className="text-white text-2xl"
+                onClick={() => {
+                  playState.setPlaying(false);
+                  ref.current.pause();
+                }}
+              >
+                <FaPause />
+              </button>
           ) : (
             <button
               className="text-white text-2xl"
@@ -390,8 +413,8 @@ const BottomPlayer = () => {
             >
               <FaPlay />
             </button>
-          )}
-          <button onClick={handleNextClick} className="text-white text-2xl">
+          ))}
+          <button disabled={track.loadingAudio} onClick={handleNextClick} className="text-white text-2xl">
             <PiFastForwardFill />
           </button>
         </div>
@@ -497,16 +520,21 @@ const BottomPlayer = () => {
                 >
                   <PiRewindFill />
                 </button>
-                {playState.playing ? (
-                  <button
-                    className="open-play-btn text-white text-6xl"
-                    onClick={() => {
-                      playState.setPlaying(false);
-                      ref.current.pause();
-                    }}
-                  >
-                    <FaPause />
+                {track.loadingAudio && progress < 90 ? (
+                  <button className="open-play-btn text-white text-6xl">
+                    <Lottie animationData={animationFile} loop={true} className="h-10 w-10 scale-800 m-0" />
                   </button>
+                ) : (
+                  playState.playing ? (
+                    <button
+                      className="open-play-btn text-white text-6xl"
+                      onClick={() => {
+                        playState.setPlaying(false);
+                        ref.current.pause();
+                      }}
+                    >
+                      <FaPause />
+                    </button>
                 ) : (
                   <button
                     className="open-play-btn text-white text-6xl"
@@ -517,7 +545,7 @@ const BottomPlayer = () => {
                   >
                     <FaPlay />
                   </button>
-                )}
+                ))}
                 <button
                   onClick={handleNextClick}
                   className="open-buttons text-white text-5xl"
@@ -527,7 +555,7 @@ const BottomPlayer = () => {
               </div>
               <div className="open-bottom-icons fixed bottom-10 w-full flex justify-around items-center">
                 <AnimatePresence>
-                  {userContext.userDetails.likedSongs.some((song) => song.id === track.currentTrack[track.currentIndex].id) ? (
+                  {userContext.likedSongs.some((song) => song.id === track.currentTrack[track.currentIndex].id) ? (
                     <motion.div
                       key="liked"
                       initial={{ opacity: 0.6 }}
@@ -690,6 +718,13 @@ const BottomPlayer = () => {
           animation: scroll 20s linear infinite;
         }
       `}</style>
+      <AnimatePresence>
+      {showMessageBox && (
+        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.5 }} className="">
+          <MessageBox message="Added to playlist" type="success" />
+        </motion.div>
+      )}
+      </AnimatePresence>
     </>
   );
 };

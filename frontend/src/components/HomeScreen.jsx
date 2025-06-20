@@ -12,6 +12,7 @@ import { auth } from "@/lib/firebase";
 import { useRouter } from "next/navigation";
 import withAuth from "@/lib/withAuth";
 import AccountScreen from "./AccountScreen";
+import MessageBox from "./MessageBox";
 
 const HomeScreen = ({trendingSongs, recommendedSongs}) => {
   const [shuffledGenres, setShuffledGenres] = useState([]);
@@ -26,6 +27,9 @@ const HomeScreen = ({trendingSongs, recommendedSongs}) => {
   const dbUserDetails = useContext(UserDetailsContext)
 
   const router = useRouter();
+
+  console.log("dbuserDetails",dbUserDetails)
+    console.log("loading audio: ", track.loadingAudio);
 
   const genreDetails = [
     {

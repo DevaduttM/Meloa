@@ -1,5 +1,5 @@
 "use client";
-import React, { useRef, useState } from "react";
+import React, { useRef, useState, useEffect } from "react";
 import Image from "next/image";
 import { FaGoogle } from "react-icons/fa";
 import { AnimatePresence, motion } from "framer-motion";
@@ -7,7 +7,7 @@ import { useRouter } from "next/navigation";
 import { IoEyeOffSharp } from "react-icons/io5";
 import { IoEyeSharp } from "react-icons/io5";
 import { auth, provider, db } from "@/lib/firebase";
-import { signInWithPopup, createUserWithEmailAndPassword, signInWithEmailAndPassword } from "firebase/auth";
+import { signInWithPopup, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged } from "firebase/auth";
 import withAuth from "@/lib/withAuth";
 import { setUserDetails } from "@/lib/firestore";
 
@@ -62,7 +62,6 @@ const Signin = () => {
         }
         const userCredential = await createUserWithEmailAndPassword(auth, email, password);
         const user = userCredential.user;
-        window.localStorage.setItem("user", JSON.stringify(user));
         await setUserDetails(user);
         alert("Sign Up Successfull!");
         setSignin(true);
@@ -75,12 +74,23 @@ const Signin = () => {
       } else if (error.code === "auth/weak-password") {
         alert("Password should be at least 6 characters.");
       }
+      else if (error.code === "auth/invalid-credential") {
+        alert("Invalid email or password. Please try again.");
+      }
     } finally {
       setEmail("");
       setPassword("");
       setConfirmPassword("");
     }
   }
+
+useEffect(() => {
+  const user = window.localStorage.getItem("user");
+  if (user) {
+    router.replace("/home");
+    return;
+  }
+}, []);
 
   return (
     <div className="h-screen w-screen flex items-center justify-center bg-[#171717] relative">
@@ -205,4 +215,4 @@ const Signin = () => {
   );
 };
 
-export default withAuth(Signin);
+export default Signin;
