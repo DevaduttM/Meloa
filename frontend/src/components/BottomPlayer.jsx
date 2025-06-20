@@ -148,13 +148,34 @@ const BottomPlayer = () => {
       try {
         const response = await fetch(`/api/nextvideo?id=${id}`);
         const data = await response.json();
+        console.log("Current Track: ", track.currentTrack);
         if (data && data.related) {
-          setNextTrack(data.related[0]);
-          handleFetchNext(data.related[0], track, playState);
-          track.setCurrentTrack((prev) => [...prev, data.related[0]]);
-          playState.setPlaying(true);
-          ref.current.play();
-          console.log("Related video set:", data.related[0]);
+          if(track.currentTrack.some((t) => t.id === data.related[0].id)) {
+            if(track.currentTrack.some((t) => t.id === data.related[1].id)) {
+              setNextTrack(data.related[2]);
+              handleFetchNext(data.related[2], track, playState);
+              track.setCurrentTrack((prev) => [...prev, data.related[2]]);
+              playState.setPlaying(true);
+              ref.current.play();
+              console.log("Related video set:", data.related[2]);
+            }
+            else {
+              setNextTrack(data.related[1]);
+              handleFetchNext(data.related[1], track, playState);
+              track.setCurrentTrack((prev) => [...prev, data.related[1]]);
+              playState.setPlaying(true);
+              ref.current.play();
+              console.log("Related video set:", data.related[1]);
+            }
+          }
+          else {
+            setNextTrack(data.related[0]);
+            handleFetchNext(data.related[0], track, playState);
+            track.setCurrentTrack((prev) => [...prev, data.related[0]]);
+            playState.setPlaying(true);
+            ref.current.play();
+            console.log("Related video set:", data.related[0]);
+          }
           await updateRecommendedSongs(userContext.userDetails, data.related[1]);
         } else {
           console.error("No related video found in response");
@@ -232,7 +253,17 @@ const BottomPlayer = () => {
           return;
         }
 
-        const nextTrack = data.related[0];
+        let nextTrack;
+
+        if(track.currentTrack.some((t) => t.id === data.related[0].id)) {
+          if(track.currentTrack.some((t) => t.id === data.related[1].id)) {
+            nextTrack = data.related[2];
+          } else {
+            nextTrack = data.related[1];
+          }
+        } else {
+          nextTrack = data.related[0];
+        }
 
         track.setCurrentTrack((prev) => [...prev, nextTrack]);
         track.setCurrentIndex((prevIndex) => prevIndex + 1);

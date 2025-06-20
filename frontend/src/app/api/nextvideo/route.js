@@ -38,7 +38,7 @@ const related = info.watch_next_feed
 
     return seconds < 300; // less than 5 minutes
   })
-  .slice(0, 2) // only take 2 videos
+  .slice(0, 3) // only take 3 videos
   .map(video => ({
     title: video.title?.text ?? "No Title",
     id: video.id ?? "Unknown ID",
