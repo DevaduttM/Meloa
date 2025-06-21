@@ -58,7 +58,7 @@ The application will be running on http://localhost:3000 and will be ready to st
 
 ### Home Screen
 <div>
-<img src = "frontend/public/screenshots/home_page.png" width = "300" alt = "Home Screen"/>
+<img src = "frontend/public/screenshots/home_screen.png" width = "300" alt = "Home Screen"/>
 </div>
 
 ### Search Screen
