@@ -67,7 +67,7 @@ const GenreScreen = ({data}) => {
         <div className="z-0 min-h-screen w-screen bg-[#171717] flex flex-col fixed top-0 left-0">
           <IoArrowBack
             onClick={() => genrectx.setOpenGenre(false)}
-            className="fixed top-7 z-60 left-5 text-4xl text-white"
+            className="fixed top-7 z-60 left-5 text-4xl text-white cursor-pointer"
           />
         <motion.div
           initial={{ opacity: 0 }}
@@ -83,13 +83,13 @@ const GenreScreen = ({data}) => {
               alt="Song Cover"
               width={200}
               height={200}
-              className="rounded-lg mb-10 mt-30 w-1/2 aspect-square shadow-[10px]"
+              className="rounded-lg mb-10 mt-30 w-1/2 md:w-[15vw] aspect-square shadow-[10px]"
             />
             <h1 className="text-white text-3xl font-syne mb-15">
               {data.name}
             </h1>
 
-            <div className="w-[80%] flex justify-around items-center">
+            <div className="w-[80%] md:w-[30vw] flex justify-around items-center">
               <button disabled = {loading} onClick={() => PlaylistPlay()} className="text-[#27df6a] text-2xl shadow-2xl flex justify-center items-center py-3 bg-[#8d8d8d31] backdrop-blur-lg border-none outline-none p-3 rounded-lg w-45">
                 <FaPlay />
                 <span className="ml-4 text-xl text-[#ffffffe0] font-syne">
@@ -103,7 +103,7 @@ const GenreScreen = ({data}) => {
                 </span>
               </button>
             </div>
-            <div className="w-full flex flex-col mt-10 justify-start items-center pb-35">
+            <div className="w-full md:w-3/4 md:border-[0.5px] md:mb-20 md:border-[#555555c2] md:backdrop-blur-[5px] md:bg-[#4b4b4b17] md:gap-3 md:py-4 md:rounded-xl flex flex-col mt-10 justify-start items-center pb-35">
               {
                 loading ? <>
                 {[...Array(10)].map((_, index) => (
@@ -122,7 +122,10 @@ const GenreScreen = ({data}) => {
                       index + 1 < 10 ? `0${index + 1}` : index + 1
                     }`}</h1>
                   </div>
+                  <div className="relative flex justify-start items-center w-full flex-col">
                   <TrackList width={"w-full"} data={data} index={index} />
+                  <hr className='absolute -left-[5%] -bottom-3 opacity-10 hidden md:flex h-[0.5px] w-[105%]'/>
+                  </div>
                 </div>
               ))}
               </>}

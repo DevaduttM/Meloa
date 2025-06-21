@@ -61,9 +61,6 @@ const SearchScreen = () => {
                 Meloa
               </h1>
             </div>
-            <div className="w-fit h-full flex justify-center items-center gap-2">
-              <FaRegCircleUser className="text-3xl text-[#27df6a] mr-2" />
-            </div>
           </div>
           <motion.div
             initial={{ opacity: 0 }}
@@ -72,31 +69,31 @@ const SearchScreen = () => {
             transition={{ duration: 0.3 }}
             className="h-full w-full flex justify-center items-center flex-col"
           >
-            <div className="relative w-full mt-10 flex items-center justify-center">
+            <div className="relative w-[90%] mt-10 flex items-center justify-center">
               <input
                 type="text"
-                className="bg-white text-black font-syne rounded-lg p-2 pl-9 outline-none w-[90%]"
+                className="bg-white text-black font-syne rounded-lg p-2 pl-9 outline-none w-full"
                 placeholder="Search..."
                 value={searchQuery}
                 onChange={(e) => {setSearchQuery(e.target.value); setSearchPerformed(false)}}
                 onKeyDown={handleKeyDown}
               />
               <RxCross2
-                className={`absolute right-10 text-gray-500 cursor-pointer ${searchQuery ? 'block' : 'hidden'}`}
+                className={`absolute right-3 text-gray-500 cursor-pointer ${searchQuery ? 'block' : 'hidden'}`}
                 onClick={() => {
                   setSearchQuery("");
                   setSearchResults([]);
                   setSearchPerformed(false);
                 }}
               />
-              <RiSearch2Line className="absolute left-9 text-gray-500" />
+              <RiSearch2Line className="absolute left-3 text-gray-500" />
             </div>
             <div className="h-full flex justify-center items-center flex-col">
               <>
                 {searchQuery ? (
                   <>
-                    <div className={`text-gray-500 text-lg font-syne mt-4 h-full justify-start flex-col items-center pt-6 px-5 ${searchResults.length > 0 && searchPerformed == true ? 'hidden' : ''}`}>
-                      <h1 className={` ${loading ? 'hidden' : 'text-gray-500 text-lg font-syne mt-4'}`}>Searching for {searchQuery}</h1>
+                    <div className={`text-gray-500 md:pl-[2.5%] text-lg md:w-[95vw] font-syne mt-4 h-full justify-start flex-col items-center pt-6 px-5 ${searchResults.length > 0 && searchPerformed == true ? 'hidden' : ''}`}>
+                      <h1 className={` ${loading ? 'hidden' : 'text-gray-500 md:w-full md:text-center text-lg font-syne mt-4'}`}>Searching for {searchQuery}</h1>
                       {loading && 
                         <>
                           {
@@ -108,7 +105,7 @@ const SearchScreen = () => {
                       }
                     </div>
                     {searchResults.length > 0 && searchPerformed == true ? (
-                      <div className="w-screen h-full gap-4 px-5 overflow-y-scroll scrollbar-hide flex flex-col items-center mt-10">
+                      <div className="w-screen h-full gap-4 px-5 md:pl-[5%] overflow-y-scroll scrollbar-hide flex flex-col items-center mt-10">
                         {searchResults.map((result, index) => (
                           <TrackList
                             width="w-full"

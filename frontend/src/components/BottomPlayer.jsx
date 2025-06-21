@@ -29,6 +29,8 @@ import Image from "next/image";
 import { Target } from "lucide-react";
 import { createPlaylist } from "@/lib/firestore";
 import MessageBox from "./MessageBox";
+import { IoVolumeMedium } from "react-icons/io5";
+
 
 const BottomPlayer = () => {
   const ref = useRef(null);
@@ -48,6 +50,42 @@ const BottomPlayer = () => {
   const [newPlaylistName, setNewPlaylistName] = useState("");
   const [availablePlaylists, setAvailablePlaylists] = useState([]);
   const [showMessageBox, setShowMessageBox] = useState(false);
+  const [volumeOpen, setVolumeOpen] = useState(false);
+  const [volume, setVolume] = useState(0.5);
+
+  const containerRef = useRef(null);
+  useEffect(() => {
+    if (ref?.current) {
+      ref.current.volume = volume;
+    }
+  }, [volume]);
+
+  const handleDrag = (e) => {
+    const container = containerRef.current;
+    if (!container) return;
+
+    const rect = container.getBoundingClientRect();
+    const offsetY = e.clientY - rect.top;
+    const height = rect.height;
+
+    const newVolume = 1 - Math.min(Math.max(offsetY / height, 0), 1);
+    setVolume(newVolume);
+  };
+
+  const startDrag = () => {
+    const move = (e) => handleDrag(e);
+    const up = () => {
+      window.removeEventListener('mousemove', move);
+      window.removeEventListener('mouseup', up);
+    };
+    window.addEventListener('mousemove', move);
+    window.addEventListener('mouseup', up);
+  };
+
+  const handleClick = (e) => {
+    e.stopPropagation();
+    handleDrag(e);
+  };
 
   const router = useRouter();
 
@@ -383,7 +421,7 @@ const BottomPlayer = () => {
           setOpenMainPlayer(true);
           window.history.pushState(null, "");
         }}
-        className="h-17 w-[97%] rounded-lg bg-[#303030ad] border-[0.5px] border-[#ffffff1e] backdrop-blur-xs flex justify-between items-center pl-[0.3rem] pr-4 overflow-hidden z-10"
+        className="md:relative h-17 w-[97%] rounded-lg cursor-pointer bg-[#303030ad] border-[0.5px] border-[#ffffff1e] backdrop-blur-xs flex justify-between items-center pl-[0.3rem] pr-4 overflow-hidden md:overflow-visible z-10"
       >
         <div className="close-data flex items-center gap-5">
           <img
@@ -416,9 +454,9 @@ const BottomPlayer = () => {
         </div>
         <div
           onClick={(e) => e.stopPropagation()}
-          className="flex items-center gap-6"
+          className="md:absolute md:left-1/2 md:-translate-x-1/2 flex items-center gap-6"
         >
-          <button disabled={track.loadingAudio} onClick={handleRewindClick} className="text-white text-2xl">
+          <button disabled={track.loadingAudio} onClick={handleRewindClick} className="text-white text-2xl cursor-pointer">
             <PiRewindFill />
           </button>
           {track.loadingAudio && progress < 90 ? (
@@ -426,7 +464,7 @@ const BottomPlayer = () => {
           ) : (
             playState.playing ? (
               <button
-                className="text-white text-2xl"
+                className="text-white text-2xl cursor-pointer"
                 onClick={() => {
                   playState.setPlaying(false);
                   ref.current.pause();
@@ -436,7 +474,7 @@ const BottomPlayer = () => {
               </button>
           ) : (
             <button
-              className="text-white text-2xl"
+              className="text-white text-2xl cursor-pointer"
               onClick={() => {
                 playState.setPlaying(true);
                 ref.current.play();
@@ -445,12 +483,27 @@ const BottomPlayer = () => {
               <FaPlay />
             </button>
           ))}
-          <button disabled={track.loadingAudio} onClick={handleNextClick} className="text-white text-2xl">
+          <button disabled={track.loadingAudio} onClick={handleNextClick} className="text-white text-2xl cursor-pointer">
             <PiFastForwardFill />
           </button>
         </div>
+        <div className="w-full md:flex hidden justify-end pr-10 text-2xl items-center">
+          <button onClick={(e) => {e.stopPropagation(); setVolumeOpen(!volumeOpen)}} className="cursor-pointer"><IoVolumeMedium /></button>
+          <AnimatePresence>
+          {
+            volumeOpen && (
+               <motion.div onClick={handleClick} initial = {{scaleY: 0}} animate = {{scaleY: 1}} exit = {{scaleY: 0}} transition={{duration: 0.3, ease: 'easeInOut'}} className="origin-bottom absolute z-5 h-[7rem] w-7 rounded-sm bottom-full mb-2 border-[0.2px] border-[#3a3a3aad] bg-[#131313] shadow-2xs flex justify-center items-center cursor-default">
+                <div  ref={containerRef} onMouseDown={handleClick} className="relative h-[90%] rounded-lg w-1 bg-[#303030] cursor-pointer flex justify-end items-center">
+                  <div className="bg-[#27df6a] w-1 rounded-lg absolute bottom-0" style={{ height: `${volume * 100}%` }}></div>
+                  <div onMouseDown={startDrag} className="bg-[#ffffff] left-1/2 -translate-x-1/2 -mb-1 h-2 rounded-full w-2 absolute cursor-pointer" style={{ bottom: `${volume * 100}%` }}></div>
+                </div>
+               </motion.div>
+          )
+          }
+          </AnimatePresence>
+        </div>
         <div
-          className="absolute bottom-[0.1px] left-0 h-[0.5px] bg-[#27df6a] rounded-xl"
+          className="absolute bottom-[0.1px] md:bottom-[0.3px] left-0 h-[0.5px] bg-[#27df6a] rounded-xl"
           style={{ width: `${progress}%` }}
         ></div>
       </motion.div>
@@ -472,7 +525,7 @@ const BottomPlayer = () => {
             <div className="fixed top-0 left-0 bg-gradient-to-b from-[#1f1f1f57] to-[#171717] w-screen h-screen backdrop-blur-[15px] flex flex-col justify-center items-center">
               <IoArrowBack
                 onClick={() => setOpenMainPlayer(false)}
-                className="open-buttons absolute top-7 left-5 text-4xl text-white"
+                className="open-buttons absolute top-7 left-5 text-4xl text-white cursor-pointer"
               />
               <div className="absolute top-7 right-5">
                 <button
@@ -480,12 +533,12 @@ const BottomPlayer = () => {
                     e.stopPropagation();
                     showPlaylists(userContext.userDetails);
                   }}
-                  className="open-buttons text-white text-3xl"
+                  className="open-buttons text-white text-3xl cursor-pointer"
                 >
                   <RiPlayListAddFill />
                 </button>
               </div>
-              <div className="track-details-open relative w-3/4 aspect-square mb-15 shadow-[10px]">
+              <div className="track-details-open relative w-3/4 md:w-[15vw] aspect-square mb-15 shadow-[10px]">
                 <Image
                   src={
                     track?.currentTrack[track?.currentIndex]?.thumbnail ||
@@ -514,7 +567,7 @@ const BottomPlayer = () => {
                   "Unknown Artist"}
               </h1>
               <div
-                className="progress-bottom relative w-[80%] h-2 bg-gray-500 mb-5 rounded-2xl"
+                className="progress-bottom relative w-[80%] h-2 md:h-1 bg-gray-500 mb-5 rounded-2xl"
                 onClick={handleSeek}
                 ref={barRef}
               >
@@ -544,10 +597,10 @@ const BottomPlayer = () => {
                     .padStart(2, "0")}
                 </span>
               </div>
-              <div className="w-[70%] flex justify-around items-center">
+              <div className="w-[70%] md:w-1/2 md:scale-70 flex justify-around items-center">
                 <button
                   onClick={handleRewindClick}
-                  className="open-buttons text-white text-5xl"
+                  className="open-buttons text-white text-5xl cursor-pointer"
                 >
                   <PiRewindFill />
                 </button>
@@ -558,7 +611,7 @@ const BottomPlayer = () => {
                 ) : (
                   playState.playing ? (
                     <button
-                      className="open-play-btn text-white text-6xl"
+                      className="open-play-btn text-white text-6xl cursor-pointer"
                       onClick={() => {
                         playState.setPlaying(false);
                         ref.current.pause();
@@ -568,7 +621,7 @@ const BottomPlayer = () => {
                     </button>
                 ) : (
                   <button
-                    className="open-play-btn text-white text-6xl"
+                    className="open-play-btn text-white text-6xl cursor-pointer"
                     onClick={() => {
                       playState.setPlaying(true);
                       ref.current.play();
@@ -579,12 +632,12 @@ const BottomPlayer = () => {
                 ))}
                 <button
                   onClick={handleNextClick}
-                  className="open-buttons text-white text-5xl"
+                  className="open-buttons text-white text-5xl cursor-pointer"
                 >
                   <PiFastForwardFill />
                 </button>
               </div>
-              <div className="open-bottom-icons fixed bottom-10 w-full flex justify-around items-center">
+              <div className="open-bottom-icons fixed bottom-10 md:scale-90 md:bottom-5 w-full flex justify-around items-center">
                 <AnimatePresence>
                   {userContext.likedSongs.some((song) => song.id === track.currentTrack[track.currentIndex].id) ? (
                     <motion.div
@@ -595,7 +648,7 @@ const BottomPlayer = () => {
                       className="open-buttons flex items-center"
                     >
                       <button
-                        className="text-red-600 text-3xl"
+                        className="text-red-600 text-3xl cursor-pointer"
                         onClick={handleLikeClick}
                       >
                         <IoMdHeart />
@@ -610,7 +663,7 @@ const BottomPlayer = () => {
                       className="flex items-center"
                     >
                       <button
-                        className="open-buttons text-white text-3xl"
+                        className="open-buttons text-white text-3xl cursor-pointer"
                         onClick={handleLikeClick}
                       >
                         <IoMdHeartEmpty />
@@ -623,12 +676,12 @@ const BottomPlayer = () => {
                     track?.currentTrack?.[track?.currentIndex]?.id
                   }`}
                   rel="noopener noreferrer"
-                  className="open-buttons text-white text-3xl"
+                  className="open-buttons text-white text-3xl cursor-pointer"
                 >
                   <RxDownload />
                 </a>
                 <button
-                  className="open-buttons text-[#27df6a] text-3xl"
+                  className="open-buttons text-[#27df6a] text-3xl cursor-pointer"
                   onClick={() => setRepeat(!repeat)}
                 >
                   <PiRepeatLight
@@ -659,7 +712,7 @@ const BottomPlayer = () => {
           >
             <div
               onClick={(e) => e.stopPropagation()}
-              className="bg-gradient-to-b from-[#b8b8b838] to-[#9696962f] backdrop-blur-2xl p-5 h-[65%] w-[85%] rounded-lg shadow-lg flex flex-col justify-start items-center "
+              className="bg-gradient-to-b from-[#b8b8b838] to-[#9696962f] backdrop-blur-2xl p-5 h-[65%] w-[85%] md:w-[30%] md:h-[80%] rounded-lg shadow-lg flex flex-col justify-start items-center "
             >
               <div className="w-[95%] flex justify-between items-center mt-3 mb-5">
                 <h1 className="text-white text-2xl font-syne">
@@ -667,7 +720,7 @@ const BottomPlayer = () => {
                 </h1>
                 <button
                   onClick={() => setCreatePlaylistScreen(!createPlaylistScreen)}
-                  className="text-white text-3xl flex justify-center items-center"
+                  className="text-white text-3xl flex justify-center items-center cursor-pointer"
                 >
                   {createPlaylistScreen ? <PiPlaylist /> : <IoAdd />}
                 </button>
@@ -696,7 +749,7 @@ const BottomPlayer = () => {
                     </div>
                     <button
                       onClick={() => createNewPlaylist(userContext.userDetails, newPlaylistName, track.currentTrack[track.currentIndex])}
-                      className="text-black bg-[#27df6a] text-md  h-10 w-25 rounded-xl font-syne"
+                      className="text-black bg-[#27df6a] text-md  h-10 w-25 rounded-xl font-syne cursor-pointer"
                     >
                       Done
                     </button>
@@ -710,7 +763,7 @@ const BottomPlayer = () => {
                       exit={{ opacity: 0 }}
                       transition={{ duration: 0.5, ease: "easeInOut" }}
                       key={index}
-                      className="w-full bg-gradient-to-r from-[#8d8d8d1e] to-[#68686842] backdrop-blur-lg rounded-lg flex justify-between items-center px-4 mb-3"
+                      className="w-full bg-gradient-to-r from-[#8d8d8d1e] to-[#68686842] backdrop-blur-lg rounded-lg flex justify-between items-center px-4 mb-3 cursor-pointer"
                     >
                       <div className="flex items-center gap-3 py-5">
                         <Image

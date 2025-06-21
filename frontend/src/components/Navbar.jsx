@@ -149,7 +149,7 @@ const addRecommendedSongs = async (songs) => {
           <div className="fixed bottom-0 w-full h-[7%] bg-gradient-to-t from-black to-[#00000052] backdrop-blur-lg flex items-center justify-around px-10">
             <div
               onClick={() => setPage("home")}
-              className="flex h-full items-center justify-center flex-col"
+              className="flex h-full items-center justify-center flex-col cursor-pointer"
             >
               {page === "home" ? (
                 <motion.div
@@ -184,7 +184,7 @@ const addRecommendedSongs = async (songs) => {
             </div>
             <div
               onClick={() => setPage("search")}
-              className="flex h-full items-center justify-center flex-col"
+              className="flex h-full items-center justify-center flex-col cursor-pointer"
             >
               {page === "search" ? (
                 <motion.div
@@ -219,7 +219,7 @@ const addRecommendedSongs = async (songs) => {
             </div>
             <div
               onClick={() => setPage("library")}
-              className="flex h-full items-center justify-center flex-col"
+              className="flex h-full items-center justify-center flex-col cursor-pointer"
             >
               {page === "library" ? (
                 <motion.div

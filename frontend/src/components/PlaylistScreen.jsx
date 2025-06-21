@@ -130,7 +130,7 @@ const PlaylistScreen = ({ playlists, liked, index }) => {
       >
         <IoArrowBack
           onClick={() => playlistctx.setOpenPlaylistScreen(false)}
-          className="fixed top-7 z-60 left-5 text-4xl text-white"
+          className="fixed top-7 z-60 left-5 text-4xl text-white cursor-pointer"
         />
         <motion.div
           initial={{ opacity: 0 }}
@@ -149,7 +149,7 @@ const PlaylistScreen = ({ playlists, liked, index }) => {
         >
           <div className="bg-gradient-to-b from-[#1f1f1f57] to-[#171717] w-screen h-screen backdrop-blur-[15px] flex flex-col justify-start items-center overflow-y-scroll scrollbar-hide">
             <div
-              className="relative w-[35vw] aspect-square flex justify-center items-center"
+              className="relative w-[35vw] md:w-[12vw] aspect-square flex justify-center items-center"
               onClick={(e) => {
                 e.stopPropagation();
                 setUploadScreen(true);
@@ -180,12 +180,12 @@ const PlaylistScreen = ({ playlists, liked, index }) => {
                 alt="Song Cover"
                 width={200}
                 height={200}
-                className="rounded-lg bg-[#1f1f1f] mb-10 mt-30 w-[35vw] aspect-square shadow-[10px]"
+                className="rounded-lg bg-[#1f1f1f] mb-10 mt-30 w-[35vw] md:w-[12vw] aspect-square shadow-[10px]"
               />
             </div>
             <div onClick={(e) => e.stopPropagation() }className="relative w-fit flex justify-start items-center mb-10">
               <input
-                className="text-white text-3xl font-syne w-[80vw] h-10 rounded-lg flex justify-center text-center items-center"
+                className="text-white text-3xl font-syne w-[80vw] md:w-[20vw] h-10 rounded-lg flex justify-center text-center items-center"
                 value={liked ? "Liked Songs" : editedPlaylistName}
                 readOnly={!edit}
                 onChange={(e) => setEditedPlaylistName(e.target.value)}
@@ -221,13 +221,13 @@ const PlaylistScreen = ({ playlists, liked, index }) => {
                         setEdit(true);
                         inputRef.current.focus();
                       }}
-                      className={` z-2 absolute right-3 top-1/2 -translate-1/2`}
+                      className={` ${liked ? "hidden" : "flex"} z-2 absolute right-3 top-1/2 -translate-1/2`}
                     />
                   </motion.div>
                 )}
               </AnimatePresence>
             </div>
-            <div className="w-[80%] flex justify-around items-center">
+            <div className="w-[80%] md:w-[35%] flex justify-around items-center">
               <button
                 onClick={PlaylistPlay}
                 className="text-[#27df6a] text-2xl shadow-2xl flex justify-center items-center py-3 bg-[#8d8d8d31] backdrop-blur-lg border-none outline-none p-3 rounded-lg w-45"
@@ -247,7 +247,7 @@ const PlaylistScreen = ({ playlists, liked, index }) => {
                 </span>
               </button>
             </div>
-            <div className="w-full flex flex-col mt-10 justify-start items-center pb-35">
+            <div className="w-full md:w-3/4 md:py-10 md:mb-20 md:rounded-xl md:border-[0.5px] md:border-[#7575756e] flex flex-col mt-10 justify-start items-center pb-35">
               {liked ? (
                 playlists.length > 0 ? (
                   playlists.map((song, index) => (
@@ -281,7 +281,10 @@ const PlaylistScreen = ({ playlists, liked, index }) => {
                         index + 1 < 10 ? `0${index + 1}` : index + 1
                       }`}</h1>
                     </div>
-                    <TrackList width={"w-full"} data={song} />
+                    <div className="relative flex justify-start items-center w-full gap-2 flex-col md:py-3">
+                      <TrackList width={"w-full"} data={song} index={index} />
+                      <hr className='absolute -left-[5%] -bottom-4 opacity-10 hidden md:flex h-[0.5px] w-[105%] mb-2 mt-2'/>
+                    </div>
                   </div>
                 ))
               )}

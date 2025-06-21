@@ -79,12 +79,12 @@ const LibraryScreen = () => {
                 Your Library
               </h1>
               <hr className="border-[#4e4e4ea8] w-[95%] my-5" />
-              <div className="w-full flex justify-between items-center pr-5">
+              <div className="w-full flex justify-between items-center pr-5 md:px-5 md:pr-12">
                 <h1 className="text-[#a3a3a3] text-lg w-full font-syne px-8">
                   Playlists
                 </h1>
                 <button
-                  className="text-2xl"
+                  className="text-2xl cursor-pointer"
                   onClick={() => setLayout(layout === "list" ? "grid" : "list")}
                 >
                   {layout === "list" ? (
@@ -100,10 +100,10 @@ const LibraryScreen = () => {
                   animate={{ opacity: 1 }}
                   exit={{ opacity: 0 }}
                   transition={{ duration: 0.3, ease: "easeInOut" }}
-                  className={`h-full w-full p-5 ${
+                  className={`h-fit w-full p-5 ${
                     layout === "list"
                       ? "flex flex-col justify-start items-start"
-                      : "grid grid-cols-3 gap-5 place-items-start"
+                      : "grid grid-cols-3 md:grid-cols-5 xl:grid-cols-8 gap-5 place-items-center"
                   } pb-30`}
                 >
                   <div
@@ -112,7 +112,7 @@ const LibraryScreen = () => {
                         layout === "list"
                           ? "flex items-center gap-3 mb-5 justify-start w-full"
                           : "flex flex-col items-center justify-center"
-                      } `}
+                      } cursor-pointer md:px-8`}
                     >
                       <Image
                         src="/liked_cover.jpg"
@@ -147,7 +147,7 @@ const LibraryScreen = () => {
                         layout === "list"
                           ? "flex items-center gap-3 mb-5 justify-start w-full"
                           : "flex flex-col items-center justify-center"
-                      } `}
+                      } cursor-pointer md:px-8`}
                       key={index}
                     >
                       <Image

@@ -56,7 +56,7 @@ const TrackList = ({ width, data, index }) => {
     <>
       <div
         onClick={handleTrackClick}
-        className={`flex items-center justify-start gap-3 ${width}`}
+        className={`flex items-center justify-start gap-3 ${width} cursor-pointer`}
       >
         <div className="relative h-15 w-15 flex-shrink-0">
           <Image

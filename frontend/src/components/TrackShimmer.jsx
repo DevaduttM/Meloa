@@ -3,7 +3,7 @@ import React from "react";
 const TrackShimmer = ({page}) => {
   return (
     <div
-      className={`w-[93vw] h-18 ${page === "search" ? "bg-[#1f1f1f]" : "bg-[#2a2a2a80] mt-2"} rounded-md animate-pulse flex justify-between items-center mb-3`}
+      className={`w-[93vw] md:w-[93%] h-18 ${page === "search" ? "bg-[#1f1f1f]" : "bg-[#2a2a2a80] mt-2"} rounded-md animate-pulse flex justify-between items-center mb-3`}
     >
       {
         page === "genre" && (

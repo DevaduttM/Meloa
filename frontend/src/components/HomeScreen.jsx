@@ -133,7 +133,7 @@ const HomeScreen = ({trendingSongs, recommendedSongs}) => {
         <AccountScreenOpenContext.Provider value={{ accountScreenOpen, setAccountScreenOpen }}>
       <AnimatePresence>
         <div className="h-screen w-screen flex justify-start items-center bg-[#171717] flex-col relative overflow-x-hidden overflow-y-scroll scrollbar-hide">
-          <div className="top-0 w-full flex justify-between px-3 pt-7 items-center">
+          <div className="top-0 w-full flex justify-between px-3 pt-7 items-center md:px-5">
             <div className="w-fit h-full flex justify-center items-center gap-2">
               <Image
                 src="/logo_img_only.png"
@@ -145,7 +145,7 @@ const HomeScreen = ({trendingSongs, recommendedSongs}) => {
                 Meloa
               </h1>
             </div>
-            <div onClick={() => {setAccountScreenOpen(true); window.history.pushState({}, null);}} className="w-fit h-full flex justify-center items-center gap-2">
+            <div onClick={() => {setAccountScreenOpen(true); window.history.pushState({}, null);}} className="w-fit h-full flex justify-center items-center gap-2 cursor-pointer">
               {
                 dbUserDetails?.userDetails.photoURL ? (
                   <div className="flex items-center gap-2">
@@ -167,7 +167,7 @@ const HomeScreen = ({trendingSongs, recommendedSongs}) => {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.3 }}
-            className="w-full flex flex-col justify-center items-start mt-10"
+            className="w-full flex flex-col justify-center items-start mt-10 md:px-6"
           >
             <h1 className="text-white text-2xl pl-6 font-syne">
               Trending Tracks
@@ -176,7 +176,7 @@ const HomeScreen = ({trendingSongs, recommendedSongs}) => {
               {trendingSongs.map((chunk, outerIndex) => (
                 <div
                   key={outerIndex}
-                  className="home-trending min-w-[65vw] flex-col gap-5 h-full flex justify-between items-center mr-4"
+                  className="home-trending min-w-[65vw] md:min-w-[35vw] flex-col gap-5 h-full flex justify-between items-center mr-4"
                 >
                   {chunk.map((item, index) => (
                     <div
@@ -197,12 +197,12 @@ const HomeScreen = ({trendingSongs, recommendedSongs}) => {
             <h1 className="text-white pl-6 text-2xl font-syne">
               Popular Genres
             </h1>
-            <div className="relative w-full grid grid-cols-2 grid-rows-3 gap-4 pl-3 pr-5 mt-8">
+            <div className="relative w-full grid grid-cols-2 grid-rows-3 md:grid-cols-6 md:grid-rows-1 gap-4 pl-3 pr-5 mt-8">
               {genreDetails.map((genre, index) => (
                 <div
                 onClick={() => {setOpenGenre(true); window.history.pushState({}, null); setGenreScreenDetails(genre);}}
                   key={index}
-                  className="relative rounded-lg h-25 w-full m-1 flex justify-center items-center overflow-hidden"
+                  className="relative rounded-lg h-25 md:h-[10vw] w-full m-1 flex justify-center items-center overflow-hidden cursor-pointer"
                   style={{
                     background: `linear-gradient(to right, ${genre.gradientFrom}, ${genre.gradientTo})`,
                   }}
@@ -212,7 +212,7 @@ const HomeScreen = ({trendingSongs, recommendedSongs}) => {
                     alt={genre.name}
                     width={50}
                     height={50}
-                    className="absolute -right-4 -bottom-4 rounded-sm h-16 w-16 object-cover -rotate-45"
+                    className="absolute -right-4 -bottom-4 rounded-sm h-16 w-16 md:h-25 md:w-25 object-cover -rotate-45"
                   />
                   <h2 className="text-white text-lg font-syne">{genre.name}</h2>
                   
@@ -227,7 +227,7 @@ const HomeScreen = ({trendingSongs, recommendedSongs}) => {
               {recommendedSongs.map((chunk, outerIndex) => (
                 <div
                   key={outerIndex}
-                  className="home-trending min-w-[65vw] flex-col gap-5 h-full flex justify-between items-center mr-4"
+                  className="home-trending min-w-[65vw] md:min-w-[35vw] flex-col gap-5 h-full flex justify-between items-center mr-4"
                 >
                   {chunk.map((item, index) => (
                     <div

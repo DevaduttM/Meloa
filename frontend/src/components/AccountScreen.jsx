@@ -153,7 +153,7 @@ useEffect(() => {
           className="rounded-full mb-4 bg-[#1f1f1f] shadow-lg p-2"
         />
         </div>
-        <div className="w-full flex justify-center items-center flex-col gap-4">
+        <div className="w-full md:w-[50%] flex justify-center items-center flex-col gap-4">
           <div className="relative w-3/4 flex justify-between items-center flex-col">
             <label
               htmlFor="name"
