@@ -12,16 +12,16 @@ const GetStarted = () => {
         exit={{ opacity: 0 }}
         transition={{ duration: 0.5}}
         className="h-screen w-screen flex items-center justify-start flex-col bg-[#171717]">
-            <div className="h-[50%] flex items-center justify-center flex-col">
+            <div className="h-[50%] md:h-[40%] flex items-center justify-center flex-col">
                 <Image
                     src="/headphone.svg"
                     alt="Meloa Logo"
                     width={200}
                     height={200}
-                    className="mt-4 w-1/2"/>
+                    className="mt-4 w-1/2 md:w-[20%]"/>
             </div>
             <h1 className="text-white text-4xl font-Syne mb-10">Welcome to Meloa</h1>
-            <div className="w-3/4 flex items-start justify-center flex-col mb-10">
+            <div className="w-3/4 md:w-[30%] flex items-start justify-center flex-col mb-10 md:mt-15">
                 <Image
                     src="/stream.svg"
                     alt="Meloa Logo"
@@ -36,7 +36,7 @@ const GetStarted = () => {
                 </p>
             </div>
 
-            <div className="w-3/4 flex items-start justify-center flex-col mb-10">
+            <div className="w-3/4 md:w-[30%] flex items-start justify-center flex-col mb-10">
                 <Image
                     src="/loop.svg"
                     alt="Meloa Logo"
@@ -51,7 +51,7 @@ const GetStarted = () => {
                 </p>
             </div>
 
-            <Link href='/signin' className='absolute bottom-4 w-3/4 font-bold h-[2.5rem] bg-[#27df6a] text-black rounded-3xl font-syne text-sm cursor-pointer flex justify-center items-center'>Get Started</Link>
+            <Link href='/signin' className='absolute bottom-4 md:bottom-15 w-3/4 md:w-[30%] font-bold h-[2.5rem] bg-[#27df6a] text-black rounded-3xl font-syne text-sm cursor-pointer flex justify-center items-center'>Get Started</Link>
         </motion.div>
     </>
   )

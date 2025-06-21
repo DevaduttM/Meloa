@@ -101,7 +101,7 @@ useEffect(() => {
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
           transition={{ duration: 0.2 }}
-          className="w-full h-full absolute flex flex-col items-center justify-center"
+          className="w-full h-full absolute flex flex-col items-center justify-center md:w-[30%]"
         >
           <Image
             src="/logo.png"
@@ -118,7 +118,7 @@ useEffect(() => {
             <p className="text-[#a5a5a5] text-sm font-Syne mb-8">
               Please enter your credentials to continue.
             </p>
-            <button onClick={handleGoogleSignIn} className="w-3/4 h-[2.5rem] bg-white text-black rounded-xl text-sm cursor-pointer flex justify-center items-center mb-8">
+            <button onClick={handleGoogleSignIn} className="w-3/4 md:w-full h-[2.5rem] bg-white text-black rounded-xl text-sm cursor-pointer flex justify-center items-center mb-8">
               <FaGoogle className="text-black mr-3" />
               Continue with Google
             </button>

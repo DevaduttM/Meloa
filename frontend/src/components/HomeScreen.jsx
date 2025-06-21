@@ -176,7 +176,7 @@ const HomeScreen = ({trendingSongs, recommendedSongs}) => {
               {trendingSongs.map((chunk, outerIndex) => (
                 <div
                   key={outerIndex}
-                  className="home-trending min-w-[65vw] md:min-w-[35vw] flex-col gap-5 h-full flex justify-between items-center mr-4"
+                  className="home-trending min-w-[65vw] md:min-w-[35vw] xl:min-w-[25vw] flex-col gap-5 h-full flex justify-between items-center mr-4"
                 >
                   {chunk.map((item, index) => (
                     <div
@@ -212,9 +212,9 @@ const HomeScreen = ({trendingSongs, recommendedSongs}) => {
                     alt={genre.name}
                     width={50}
                     height={50}
-                    className="absolute -right-4 -bottom-4 rounded-sm h-16 w-16 md:h-25 md:w-25 object-cover -rotate-45"
+                    className="absolute -right-4 -bottom-4 rounded-sm h-16 w-16 md:w-18 xl:h-25 md:h-18 xl:w-25 object-cover -rotate-45"
                   />
-                  <h2 className="text-white text-lg font-syne">{genre.name}</h2>
+                  <h2 className="text-white text-lg font-syne z-2">{genre.name}</h2>
                   
                 </div>
               ))}
@@ -227,7 +227,7 @@ const HomeScreen = ({trendingSongs, recommendedSongs}) => {
               {recommendedSongs.map((chunk, outerIndex) => (
                 <div
                   key={outerIndex}
-                  className="home-trending min-w-[65vw] md:min-w-[35vw] flex-col gap-5 h-full flex justify-between items-center mr-4"
+                  className="home-trending min-w-[65vw] md:min-w-[35vw] xl:min-w-[25vw] flex-col gap-5 h-full flex justify-between items-center mr-4"
                 >
                   {chunk.map((item, index) => (
                     <div
