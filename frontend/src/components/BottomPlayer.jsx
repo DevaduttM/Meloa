@@ -400,6 +400,28 @@ const BottomPlayer = () => {
     }
   }, [track.loadingAudio]);
 
+    useEffect(() => {
+    if ('mediaSession' in navigator) {
+      navigator.mediaSession.metadata = new window.MediaMetadata({
+        title: track?.currentTrack[track?.currentIndex]?.title || "Unknown Title",
+        artist: track?.currentTrack[track?.currentIndex]?.channel || "Unknown Artist",
+        artwork: [
+          {
+            src: track?.currentTrack[track?.currentIndex]?.thumbnail || "/logo_img_only.png",
+            sizes: '512x512',
+            type: 'image/png',
+          },
+        ],
+      });
+      navigator.mediaSession.setActionHandler('play', () => {
+        ref.current?.play();
+      });
+      navigator.mediaSession.setActionHandler('pause', () => {
+        ref.current?.pause();
+      });
+    }
+  }, [track?.currentTrack, track?.currentIndex]);
+
   return (
     <>
       <audio
@@ -411,6 +433,7 @@ const BottomPlayer = () => {
         className="hidden"
         autoPlay
         id="audio-player"
+        title={track?.currentTrack[track?.currentIndex]?.title || "Audio Player"}
       ></audio>
       <motion.div
         initial={{ opacity: 0, y: 10 }}

@@ -8,7 +8,7 @@ export const handleFetchAudio = async (data, track, player) => {
     return;
   }
   try {
-    const response = await axios.get(`http://192.168.1.7:5000/audio?id=${data.id}`);
+    const response = await axios.get(`https://though-commented-bulk-behavior.trycloudflare.com/audio?id=${data.id}`);
     // const response = await fetch(`/api/audio?id=${data.id}`);
     const audioData = await response.data;
     console.log("Audio data fetched:", audioData);
@@ -35,7 +35,7 @@ export const handleFetchAudio = async (data, track, player) => {
 export const handleFetchNext = async (data, track, play) => {
   track.setLoadingAudio(true);
   try {
-    const response = await fetch(`http://192.168.1.7:5000/audio?id=${data.id}`);
+    const response = await fetch(`https://though-commented-bulk-behavior.trycloudflare.com/audio?id=${data.id}`);
     const audioData = await response.json();
     console.log("Audio data fetched:", audioData);
     if (audioData && audioData.audioUrl) {
