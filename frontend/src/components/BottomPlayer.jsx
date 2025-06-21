@@ -51,7 +51,7 @@ const BottomPlayer = () => {
   const [availablePlaylists, setAvailablePlaylists] = useState([]);
   const [showMessageBox, setShowMessageBox] = useState(false);
   const [volumeOpen, setVolumeOpen] = useState(false);
-  const [volume, setVolume] = useState(0.5);
+  const [volume, setVolume] = useState(1);
 
   const containerRef = useRef(null);
   useEffect(() => {
@@ -567,7 +567,7 @@ const BottomPlayer = () => {
                   "Unknown Artist"}
               </h1>
               <div
-                className="progress-bottom relative w-[80%] h-2 md:h-1 bg-gray-500 mb-5 rounded-2xl"
+                className="progress-bottom relative w-[80%] h-2 md:h-1 bg-gray-500 mb-5 rounded-2xl cursor-pointer"
                 onClick={handleSeek}
                 ref={barRef}
               >
@@ -576,7 +576,7 @@ const BottomPlayer = () => {
                   style={{ width: `${progress}%` }}
                 ></div>
                 <div
-                  className="absolute w-3 h-3 top-1/2 -translate-y-1/2 transorm-all duration-200 ease-in-out bg-white rounded-full shadow-2xl z-5"
+                  className="absolute w-3 h-3 top-1/2 -translate-y-1/2 transorm-all duration-200 ease-in-out bg-white rounded-full shadow-2xl z-5 cursor-pointer"
                   style={{
                     left: `${progress}%`,
                     transform: "translateX(-50%)",
