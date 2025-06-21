@@ -58,30 +58,30 @@ The application will be running on http://localhost:3000 and will be ready to st
 
 ### Home Screen
 <div>
-<img src = "/screenshots/home_page.png" width = "300" alt = "Home Screen"/>
+<img src = "frontend/public/screenshots/home_page.png" width = "300" alt = "Home Screen"/>
 </div>
 
 ### Search Screen
 <div>
-<img src = "/screenshots/search_screen.png" width = "300" alt = "Search Screen"/>
+<img src = "frontend/public/screenshots/search_screen.png" width = "300" alt = "Search Screen"/>
 </div>
 
 ### Library Screen
 <div>
-<img src = "/screenshots/library_screen.png" width = "300" alt = "Library Screen"/>
+<img src = "frontend/public/screenshots/library_screen.png" width = "300" alt = "Library Screen"/>
 </div>
 
 ### Player Screen
 <div>
-<img src = "/screenshots/player_screen.png" width = "300" alt = "Player Screen"/>
+<img src = "frontend/public/screenshots/player_screen.png" width = "300" alt = "Player Screen"/>
 </div>
 
 ### Playlist Screen
 <div>
-<img src = "/screenshots/playlist_screen.png" width = "300" alt = "Playlist Screen"/>
+<img src = "frontend/public/screenshots/playlist_screen.png" width = "300" alt = "Playlist Screen"/>
 </div>
 
 ### Genre Screen
 <div>
-<img src = "/screenshots/genre_screen.png" width = "300" alt = "Genre Screen"/>
+<img src = "frontend/public/screenshots/genre_screen.png" width = "300" alt = "Genre Screen"/>
 </div>
