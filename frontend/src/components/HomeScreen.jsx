@@ -212,9 +212,9 @@ const HomeScreen = ({trendingSongs, recommendedSongs}) => {
                     alt={genre.name}
                     width={50}
                     height={50}
-                    className="absolute -right-4 -bottom-4 rounded-sm h-16 w-16 md:w-18 xl:h-25 md:h-18 xl:w-25 object-cover -rotate-45"
+                    className="absolute -right-4 -bottom-4 rounded-sm h-16 w-16 md:w-18 xl:h-25 md:h-18 xl:w-25 object-cover -rotate-45 z-0"
                   />
-                  <h2 className="text-white text-lg font-syne z-2">{genre.name}</h2>
+                  <h2 className="absolute top-1/2 -translate-y-1/2 text-white text-lg font-syne">{genre.name}</h2>
                   
                 </div>
               ))}

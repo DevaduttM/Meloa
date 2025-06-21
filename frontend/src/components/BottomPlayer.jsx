@@ -432,7 +432,7 @@ const BottomPlayer = () => {
             alt="Song Cover"
             className="h-14 w-14 rounded-md object-cover"
           />
-          <div className="flex flex-col overflow-hidden whitespace-nowrap relative w-[50vw]">
+          <div className="flex flex-col overflow-hidden whitespace-nowrap relative w-[50vw] md:w-[35vw] lg:w-[40vw]">
             <span
               className={`track-title text-white ${
                 track?.currentTrack[track?.currentIndex]?.title
