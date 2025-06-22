@@ -8,7 +8,7 @@ export const handleFetchAudio = async (data, track, player) => {
     return;
   }
   try {
-    const response = await axios.get(`${process.env.NEXT_PUBLIC_BACKEND}/audio?id=${data.id}`);
+    const response = await axios.get(`https://musicians-celebrity-prophet-selling.trycloudflare.com/audio?id=${data.id}`);
     // const response = await fetch(`/api/audio?id=${data.id}`);
     const audioData = await response.data;
     console.log("Audio data fetched:", audioData);
@@ -35,7 +35,7 @@ export const handleFetchAudio = async (data, track, player) => {
 export const handleFetchNext = async (data, track, play) => {
   track.setLoadingAudio(true);
   try {
-    const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND}/audio?id=${data.id}`);
+    const response = await fetch(`https://musicians-celebrity-prophet-selling.trycloudflare.com/audio?id=${data.id}`);
     const audioData = await response.json();
     console.log("Audio data fetched:", audioData);
     if (audioData && audioData.audioUrl) {
